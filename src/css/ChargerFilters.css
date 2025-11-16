@@ -1,0 +1,26 @@
+/* src/css/ChargerFilters.css */
+.charger-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.charger-filters input {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.charger-filters button {
+  padding: 8px 16px;
+  background-color: #28a745;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+}
+
+.charger-filters button:hover {
+  background-color: #218838;
+}
