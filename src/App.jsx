@@ -1,3 +1,4 @@
+// src/App.jsx - UPDATED with MyBookings route
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
@@ -7,11 +8,12 @@ import DashboardLayout from "./components/dashboard/DashboardLayout";
 // User Sections
 import ChargerList from "./components/dashboard/user/sections/ChargerList";
 import ChargerDetail from "./components/dashboard/user/sections/ChargerDetail";
+import MyBookings from "./components/dashboard/user/sections/MyBookings"; // NEW
 
 // Host Sections
 import HostChargers from "./components/dashboard/host/sections/HostChargers";
 import AddCharger from "./components/dashboard/host/sections/AddCharger";
-import EditCharger from "./components/dashboard/host/sections/EditCharger"; // new
+import EditCharger from "./components/dashboard/host/sections/EditCharger";
 import HostBookings from "./components/dashboard/host/sections/HostBookings";
 
 // Admin Sections
@@ -38,30 +40,32 @@ function App() {
           }
         >
           <Route path="chargers" element={<ChargerList />} />
+          <Route path="charger/:id" element={<ChargerDetail />} />
+          <Route path="my-bookings" element={<MyBookings />} /> {/* NEW */}
           <Route path="profile" element={<div>User Profile</div>} />
           <Route path="payments" element={<div>User Payments</div>} />
           <Route path="support" element={<div>User Support</div>} />
           <Route index element={<div>Welcome to User Dashboard</div>} />
-          <Route path="charger/:id" element={<ChargerDetail />} />
         </Route>
 
         {/* Host Dashboard */}
-<Route
-  path="/host-dashboard/*"
-  element={
-    <ProtectedRoute allowedRoles={["HOST"]}>
-      <DashboardLayout role="HOST" />
-    </ProtectedRoute>
-  }
->
-  <Route path="my-chargers" element={<HostChargers />} />
-  <Route path="add-charger" element={<AddCharger />} />
-  <Route path="edit-charger/:id" element={<EditCharger />} />
-  <Route path="bookings" element={<HostBookings />} />
-  <Route path="payments" element={<div>Host Payments</div>} />
-  <Route path="support" element={<div>Host Support</div>} />
-  <Route index element={<div>Welcome to Host Dashboard</div>} />
-</Route>
+        <Route
+          path="/host-dashboard/*"
+          element={
+            <ProtectedRoute allowedRoles={["HOST"]}>
+              <DashboardLayout role="HOST" />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="my-chargers" element={<HostChargers />} />
+          <Route path="add-charger" element={<AddCharger />} />
+          <Route path="edit-charger/:id" element={<EditCharger />} />
+          <Route path="bookings" element={<HostBookings />} />
+          <Route path="payments" element={<div>Host Payments</div>} />
+          <Route path="support" element={<div>Host Support</div>} />
+          <Route index element={<div>Welcome to Host Dashboard</div>} />
+        </Route>
+
         {/* Admin Dashboard */}
         <Route
           path="/admin-dashboard/*"

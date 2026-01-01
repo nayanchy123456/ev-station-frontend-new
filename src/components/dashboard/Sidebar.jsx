@@ -13,7 +13,8 @@ import {
   FaHome,
   FaCog,
   FaBars,
-  FaTimes
+  FaTimes,
+  FaCalendarCheck
 } from "react-icons/fa";
 
 const Sidebar = ({ role, setActiveSection, activeSection, handleLogout, collapsed, toggleSidebar }) => {
@@ -22,6 +23,7 @@ const Sidebar = ({ role, setActiveSection, activeSection, handleLogout, collapse
     { key: "dashboard", icon: <FaHome />, label: "Dashboard" },
     { key: "profile", icon: <FaUser />, label: "Profile" },
     { key: "chargers", icon: <FaChargingStation />, label: "Find Chargers" },
+    { key: "bookings", icon: <FaCalendarCheck />, label: "My Bookings" },
     { key: "payments", icon: <FaMoneyBillAlt />, label: "Payments" },
     { key: "support", icon: <FaLifeRing />, label: "Support" },
     { key: "settings", icon: <FaCog />, label: "Settings" }

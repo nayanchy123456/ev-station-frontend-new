@@ -8,6 +8,7 @@ import UserProfile from "./user/sections/UserProfile";
 import UserPayments from "./user/sections/UserPayments";
 import UserSupport from "./user/sections/UserSupport";
 import ChargerList from "./user/sections/ChargerList";
+import MyBookings from "./user/sections/MyBookings"; // ✅ Import MyBookings
 
 // Host Sections
 import HostChargers from "./host/sections/HostChargers";
@@ -52,6 +53,8 @@ const DashboardLayout = ({ role }) => {
           return <UserSupport />;
         case "chargers":
           return <ChargerList filters={searchFilters} />;
+        case "bookings": // ✅ Added MyBookings
+          return <MyBookings setActiveSection={setActiveSection} />;
         default:
           return <UserProfile />;
       }
