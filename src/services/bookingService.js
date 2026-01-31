@@ -3,7 +3,7 @@ import api from "./api.js";
 
 const bookingService = {
   /**
-   * Create a new booking
+   * Create a new booking (DEPRECATED - Use reservationService.createReservation instead)
    */
   createBooking: async (bookingData) => {
     try {
@@ -37,8 +37,7 @@ const bookingService = {
   },
 
   /**
-   * ✅ NEW: Get bookings for host's chargers
-   * @returns {Promise<Array>} List of bookings for all host's chargers
+   * Get bookings for host's chargers
    */
   getBookingsByHost: async () => {
     try {
@@ -64,26 +63,18 @@ const bookingService = {
   },
 
   /**
-   * Cancel a booking
+   * Cancel a booking (with automatic refund if paid)
    */
-  cancelBooking: async (bookingId) => {
+  cancelBooking: async (bookingId, reason = "") => {
     try {
-      const response = await api.put(`/bookings/${bookingId}/cancel`);
+      const response = await api.put(`/bookings/${bookingId}/cancel`, {
+        reason: reason || undefined
+      });
       return response.data;
     } catch (error) {
       console.error("Cancel booking error:", error);
       throw new Error(error.response?.data?.message || "Failed to cancel booking");
     }
-  },
-
-  /**
-   * Check if booking can be cancelled (within 1 hour rule)
-   */
-  canCancelBooking: (startTime) => {
-    const start = new Date(startTime);
-    const now = new Date();
-    const hourBeforeStart = new Date(start.getTime() - 60 * 60 * 1000);
-    return now < hourBeforeStart;
   },
 
   /**
@@ -170,29 +161,55 @@ const bookingService = {
   },
 
   /**
-   * Get booking status color
+   * Get booking status color - UPDATED with new statuses
    */
   getStatusColor: (status) => {
     const colors = {
-      CONFIRMED: "#10b981",
-      ACTIVE: "#3b82f6",
-      COMPLETED: "#64748b",
-      CANCELLED: "#ef4444"
+      RESERVED: "#f59e0b",           // Orange - awaiting payment
+      PAYMENT_PENDING: "#f97316",    // Orange-red - payment initiated
+      CONFIRMED: "#10b981",          // Green - payment successful
+      ACTIVE: "#3b82f6",             // Blue - charging in progress
+      COMPLETED: "#64748b",          // Gray - finished
+      CANCELLED: "#ef4444",          // Red - cancelled
+      EXPIRED: "#6b7280"             // Dark gray - reservation expired
     };
     return colors[status] || "#64748b";
   },
 
   /**
-   * Get booking status display text
+   * Get booking status display text - UPDATED with new statuses
    */
   getStatusDisplayText: (status) => {
     const texts = {
+      RESERVED: "Reserved",
+      PAYMENT_PENDING: "Payment Pending",
       CONFIRMED: "Confirmed",
       ACTIVE: "Active",
       COMPLETED: "Completed",
-      CANCELLED: "Cancelled"
+      CANCELLED: "Cancelled",
+      EXPIRED: "Expired"
     };
     return texts[status] || status;
+  },
+
+  /**
+   * Check if booking needs payment
+   */
+  needsPayment: (status) => {
+    return status === "RESERVED" || status === "PAYMENT_PENDING";
+  },
+
+  /**
+   * Check if booking is cancellable (CONFIRMED bookings only, >1hr before start)
+   */
+  canCancelBooking: (status, startTime) => {
+    if (status !== "CONFIRMED") return false;
+    
+    const start = new Date(startTime);
+    const now = new Date();
+    const oneHourBefore = new Date(start.getTime() - 60 * 60 * 1000);
+    
+    return now < oneHourBefore;
   },
 
   /**
@@ -201,7 +218,7 @@ const bookingService = {
   isUpcoming: (startTime, status) => {
     const now = new Date();
     const start = new Date(startTime);
-    return status === "CONFIRMED" && start > now;
+    return (status === "CONFIRMED" || status === "RESERVED" || status === "PAYMENT_PENDING") && start > now;
   },
 
   /**
@@ -210,7 +227,7 @@ const bookingService = {
   isPast: (endTime, status) => {
     const now = new Date();
     const end = new Date(endTime);
-    return (status === "COMPLETED" || status === "CANCELLED") || end < now;
+    return (status === "COMPLETED" || status === "CANCELLED" || status === "EXPIRED") || end < now;
   },
 
   /**
@@ -278,6 +295,22 @@ const bookingService = {
   filterByStatus: (bookings, status) => {
     if (status === "ALL") return bookings;
     return bookings.filter(b => b.status === status);
+  },
+
+  /**
+   * Get booking status badge style
+   */
+  getStatusBadgeClass: (status) => {
+    const classes = {
+      RESERVED: "badge-warning",
+      PAYMENT_PENDING: "badge-warning-alt",
+      CONFIRMED: "badge-success",
+      ACTIVE: "badge-info",
+      COMPLETED: "badge-secondary",
+      CANCELLED: "badge-danger",
+      EXPIRED: "badge-dark"
+    };
+    return classes[status] || "badge-secondary";
   }
 };
 

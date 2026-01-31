@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
+import reservationService from "../../../../services/reservationService";
 import bookingService from "../../../../services/bookingService";
-import   "../../../../css/bookings/bookCharger.css";
+import PaymentModal from "./PaymentModal";
+import "../../../../css/bookings/bookCharger.css";
+
 const BookCharger = ({ charger, onBookingSuccess, onClose }) => {
-  const [bookingData, setBookingData] = useState({
+  const [reservationData, setReservationData] = useState({
     startTime: "",
     endTime: "",
   });
@@ -11,6 +14,10 @@ const BookCharger = ({ charger, onBookingSuccess, onClose }) => {
   const [existingBookings, setExistingBookings] = useState([]);
   const [loadingBookings, setLoadingBookings] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  
+  // Payment modal state
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [currentReservation, setCurrentReservation] = useState(null);
 
   useEffect(() => {
     fetchChargerBookings();
@@ -20,7 +27,10 @@ const BookCharger = ({ charger, onBookingSuccess, onClose }) => {
     setLoadingBookings(true);
     try {
       const bookings = await bookingService.getChargerBookings(charger.id);
-      const activeBookings = bookings.filter(b => b.status !== "CANCELLED");
+      // Include RESERVED, PAYMENT_PENDING, CONFIRMED, ACTIVE in conflicts
+      const activeBookings = bookings.filter(
+        b => !["CANCELLED", "EXPIRED", "COMPLETED"].includes(b.status)
+      );
       setExistingBookings(activeBookings);
     } catch (err) {
       console.error("Failed to fetch bookings:", err);
@@ -65,7 +75,7 @@ const BookCharger = ({ charger, onBookingSuccess, onClose }) => {
     start.setHours(hour, 0, 0, 0);
     
     const end = new Date(start);
-    end.setHours(hour + 2, 0, 0, 0); // Default 2 hour booking
+    end.setHours(hour + 2, 0, 0, 0);
 
     const formatDateTime = (date) => {
       const year = date.getFullYear();
@@ -76,7 +86,7 @@ const BookCharger = ({ charger, onBookingSuccess, onClose }) => {
       return `${year}-${month}-${day}T${hours}:${minutes}`;
     };
 
-    setBookingData({
+    setReservationData({
       startTime: formatDateTime(start),
       endTime: formatDateTime(end)
     });
@@ -84,14 +94,14 @@ const BookCharger = ({ charger, onBookingSuccess, onClose }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setBookingData({ ...bookingData, [name]: value });
+    setReservationData({ ...reservationData, [name]: value });
     if (statusMessage) setStatusMessage("");
   };
 
   const calculateDuration = () => {
-    if (!bookingData.startTime || !bookingData.endTime) return null;
-    const start = new Date(bookingData.startTime);
-    const end = new Date(bookingData.endTime);
+    if (!reservationData.startTime || !reservationData.endTime) return null;
+    const start = new Date(reservationData.startTime);
+    const end = new Date(reservationData.endTime);
     const hours = (end - start) / (1000 * 60 * 60);
     return hours > 0 ? hours.toFixed(2) : null;
   };
@@ -106,8 +116,8 @@ const BookCharger = ({ charger, onBookingSuccess, onClose }) => {
   const handleSubmit = async () => {
     setStatusMessage("");
     const validation = bookingService.validateBookingTime(
-      bookingData.startTime, 
-      bookingData.endTime
+      reservationData.startTime, 
+      reservationData.endTime
     );
 
     if (!validation.isValid) {
@@ -115,27 +125,52 @@ const BookCharger = ({ charger, onBookingSuccess, onClose }) => {
       return;
     }
 
-    if (checkTimeConflict(bookingData.startTime, bookingData.endTime)) {
+    if (checkTimeConflict(reservationData.startTime, reservationData.endTime)) {
       setStatusMessage("❌ Your selected time conflicts with an existing booking!");
       return;
     }
 
     setIsSubmitting(true);
     try {
-      await bookingService.createBooking({
+      // Create reservation instead of direct booking
+      const reservation = await reservationService.createReservation({
         chargerId: charger.id,
-        startTime: bookingData.startTime,
-        endTime: bookingData.endTime,
+        startTime: reservationData.startTime,
+        endTime: reservationData.endTime,
       });
-      setStatusMessage("✅ Booking created successfully!");
+      
+      setStatusMessage("✅ Reservation created! Opening payment window...");
+      setCurrentReservation(reservation);
+      
+      // Open payment modal after short delay
       setTimeout(() => {
-        if (onBookingSuccess) onBookingSuccess();
-      }, 1500);
+        setShowPaymentModal(true);
+        setStatusMessage("");
+      }, 1000);
+      
     } catch (err) {
-      setStatusMessage(`❌ ${err.message || "Failed to create booking"}`);
+      setStatusMessage(`❌ ${err.message || "Failed to create reservation"}`);
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handlePaymentSuccess = (paymentResult) => {
+    setShowPaymentModal(false);
+    setCurrentReservation(null);
+    if (onBookingSuccess) onBookingSuccess();
+  };
+
+  const handlePaymentClose = () => {
+    setShowPaymentModal(false);
+    fetchChargerBookings();
+  };
+
+  const handleReservationExpire = () => {
+    setShowPaymentModal(false);
+    setCurrentReservation(null);
+    setStatusMessage("⚠️ Reservation expired! Please create a new reservation.");
+    fetchChargerBookings();
   };
 
   const duration = calculateDuration();
@@ -158,148 +193,183 @@ const BookCharger = ({ charger, onBookingSuccess, onClose }) => {
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
   return (
-    <div className="book-charger-modal">
-      <div className="modal-overlay" onClick={onClose}></div>
-      <div className="modal-content">
-        <button className="close-btn" onClick={onClose}>✖</button>
-        
-        <h2 className="modal-title">Book {charger.name}</h2>
-
-        {/* Visual Calendar */}
-        <div className="calendar-section">
-          <div className="calendar-header">
-            <button 
-              onClick={prevDay} 
-              className="nav-btn" 
-              disabled={selectedDate.toDateString() === new Date().toDateString()}
-            >
-              ←
-            </button>
-            <h3 className="date-title">
-              {selectedDate.toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                month: 'long', 
-                day: 'numeric' 
-              })}
-            </h3>
-            <button onClick={nextDay} className="nav-btn">→</button>
-          </div>
-
-          <div className="legend">
-            <div className="legend-item">
-              <div className="legend-box available"></div>
-              <span>Available</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-box booked"></div>
-              <span>Booked</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-box past"></div>
-              <span>Past</span>
+    <>
+      <div className="book-charger-modal">
+        <div className="modal-overlay" onClick={onClose}></div>
+        <div className="modal-content">
+          <button className="close-btn" onClick={onClose}>✖</button>
+          
+          <h2 className="modal-title">Reserve {charger.name}</h2>
+          
+          <div className="info-banner">
+            <div className="info-icon">⏰</div>
+            <div className="info-text">
+              <strong>Reservation System:</strong> You'll have 10 minutes to complete payment after creating a reservation.
             </div>
           </div>
 
-          {loadingBookings ? (
-            <div className="loading-box">
-              <div className="spinner"></div>
-              <p>Loading...</p>
-            </div>
-          ) : (
-            <div className="time-grid">
-              {hours.map(hour => {
-                const isBooked = isTimeSlotBooked(selectedDate, hour);
-                const isPast = isPastTime(selectedDate, hour);
-                const isAvailable = !isBooked && !isPast;
-                
-                return (
-                  <div
-                    key={hour}
-                    onClick={() => isAvailable && handleSlotClick(hour)}
-                    className={`time-slot ${
-                      isPast ? 'past' : 
-                      isBooked ? 'booked' : 
-                      'available'
-                    } ${isAvailable ? 'clickable' : ''}`}
-                  >
-                    <div className="slot-time">
-                      {hour.toString().padStart(2, '0')}:00
-                    </div>
-                    <div className="slot-status">
-                      {isPast ? '⏱️' : isBooked ? '🔒' : '✓'}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {statusMessage && (
-          <div className={`status-message ${statusMessage.includes("✅") ? 'success' : 'error'}`}>
-            {statusMessage}
-          </div>
-        )}
-
-        {/* Manual Time Selection */}
-        <div className="form-container">
-          <p className="form-title">Or select exact times:</p>
-          <div className="form-row">
-            <div className="form-group">
-              <label>Start Time</label>
-              <input
-                type="datetime-local"
-                name="startTime"
-                value={bookingData.startTime}
-                onChange={handleChange}
-                min={new Date(Date.now() + 15 * 60000).toISOString().slice(0, 16)}
-              />
+          {/* Visual Calendar */}
+          <div className="calendar-section">
+            <div className="calendar-header">
+              <button 
+                onClick={prevDay} 
+                className="nav-btn" 
+                disabled={selectedDate.toDateString() === new Date().toDateString()}
+              >
+                ←
+              </button>
+              <h3 className="date-title">
+                {selectedDate.toLocaleDateString('en-US', { 
+                  weekday: 'long', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}
+              </h3>
+              <button onClick={nextDay} className="nav-btn">→</button>
             </div>
 
-            <div className="form-group">
-              <label>End Time</label>
-              <input
-                type="datetime-local"
-                name="endTime"
-                value={bookingData.endTime}
-                onChange={handleChange}
-                min={bookingData.startTime}
-              />
-            </div>
-          </div>
-
-          {duration && (
-            <div className="summary">
-              <div className="summary-row">
-                <span className="summary-label">⏱️ Duration:</span>
-                <span className="summary-value">{duration} hours</span>
+            <div className="legend">
+              <div className="legend-item">
+                <div className="legend-box available"></div>
+                <span>Available</span>
               </div>
-              {estimatedCost && (
-                <div className="summary-row">
-                  <span className="summary-label">💰 Estimated Cost:</span>
-                  <span className="summary-value">Rs {estimatedCost}</span>
-                </div>
-              )}
+              <div className="legend-item">
+                <div className="legend-box booked"></div>
+                <span>Booked/Reserved</span>
+              </div>
+              <div className="legend-item">
+                <div className="legend-box past"></div>
+                <span>Past</span>
+              </div>
+            </div>
+
+            {loadingBookings ? (
+              <div className="loading-box">
+                <div className="spinner"></div>
+                <p>Loading availability...</p>
+              </div>
+            ) : (
+              <div className="time-grid">
+                {hours.map(hour => {
+                  const isBooked = isTimeSlotBooked(selectedDate, hour);
+                  const isPast = isPastTime(selectedDate, hour);
+                  const isAvailable = !isBooked && !isPast;
+                  
+                  return (
+                    <div
+                      key={hour}
+                      onClick={() => isAvailable && handleSlotClick(hour)}
+                      className={`time-slot ${
+                        isPast ? 'past' : 
+                        isBooked ? 'booked' : 
+                        'available'
+                      } ${isAvailable ? 'clickable' : ''}`}
+                      title={
+                        isPast ? 'Time has passed' :
+                        isBooked ? 'Already booked' :
+                        'Click to select'
+                      }
+                    >
+                      <div className="slot-time">
+                        {hour.toString().padStart(2, '0')}:00
+                      </div>
+                      <div className="slot-status">
+                        {isPast ? '⏱️' : isBooked ? '🔒' : '✓'}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {statusMessage && (
+            <div className={`status-message ${statusMessage.includes("✅") ? 'success' : 'error'}`}>
+              {statusMessage}
             </div>
           )}
 
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitting || !duration}
-            className={`submit-btn ${(isSubmitting || !duration) ? 'disabled' : ''}`}
-          >
-            {isSubmitting ? (
-              <>
-                <span className="btn-spinner"></span>
-                Creating...
-              </>
-            ) : (
-              "Confirm Booking"
+          {/* Manual Time Selection */}
+          <div className="form-container">
+            <p className="form-title">Or select exact times:</p>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Start Time *</label>
+                <input
+                  type="datetime-local"
+                  name="startTime"
+                  value={reservationData.startTime}
+                  onChange={handleChange}
+                  min={bookingService.getMinStartTime()}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>End Time *</label>
+                <input
+                  type="datetime-local"
+                  name="endTime"
+                  value={reservationData.endTime}
+                  onChange={handleChange}
+                  min={bookingService.getMinEndTime(reservationData.startTime)}
+                  max={bookingService.getMaxEndTime(reservationData.startTime)}
+                />
+              </div>
+            </div>
+
+            {duration && (
+              <div className="summary">
+                <div className="summary-row">
+                  <span className="summary-label">⏱️ Duration:</span>
+                  <span className="summary-value">{duration} hours</span>
+                </div>
+                {estimatedCost && (
+                  <div className="summary-row">
+                    <span className="summary-label">💰 Estimated Cost:</span>
+                    <span className="summary-value">NPR {estimatedCost}</span>
+                  </div>
+                )}
+                <div className="summary-note">
+                  <small>* Based on average 7kW charging rate</small>
+                </div>
+              </div>
             )}
-          </button>
+
+            <button
+              onClick={handleSubmit}
+              disabled={isSubmitting || !duration}
+              className={`submit-btn ${(isSubmitting || !duration) ? 'disabled' : ''}`}
+            >
+              {isSubmitting ? (
+                <>
+                  <span className="btn-spinner"></span>
+                  Creating Reservation...
+                </>
+              ) : (
+                <>
+                  <span className="btn-icon">🔒</span>
+                  Create Reservation
+                </>
+              )}
+            </button>
+            
+            <p className="help-text">
+              💡 After creating a reservation, you'll be prompted to complete payment within 10 minutes to confirm your booking.
+            </p>
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Payment Modal */}
+      {showPaymentModal && currentReservation && (
+        <PaymentModal
+          reservation={currentReservation}
+          onSuccess={handlePaymentSuccess}
+          onClose={handlePaymentClose}
+          onExpire={handleReservationExpire}
+        />
+      )}
+    </>
   );
 };
 

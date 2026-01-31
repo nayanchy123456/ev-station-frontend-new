@@ -1,4 +1,4 @@
-/* hostBookings.css */
+/* hostBookings.css - Dark Theme with Payment Features */
 
 .host-bookings-container {
   padding: 24px 32px;
@@ -64,10 +64,19 @@
   box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
 }
 
-.refresh-btn:hover {
+.refresh-btn:hover:not(:disabled) {
   background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+}
+
+.refresh-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.refresh-icon {
+  font-size: 18px;
 }
 
 /* Error Banner */
@@ -142,9 +151,29 @@
   border-color: rgba(59, 130, 246, 0.4);
 }
 
+/* NEW: Pending payment stat styling */
+.stat-card.pending {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.15) 100%);
+  border-color: rgba(245, 158, 11, 0.5);
+}
+
+.stat-card.pending:hover {
+  border-color: rgba(245, 158, 11, 0.6);
+}
+
+.stat-card.upcoming {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.15) 100%);
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
 .stat-card.active {
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.3) 100%);
   border-color: rgba(59, 130, 246, 0.5);
+}
+
+.stat-card.completed {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(124, 58, 237, 0.15) 100%);
+  border-color: rgba(139, 92, 246, 0.5);
 }
 
 .stat-card.revenue {
@@ -247,6 +276,27 @@
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
+/* NEW: Badge classes for different status tabs */
+.filter-tab.badge-warning:hover {
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.filter-tab.badge-warning.active {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.filter-tab.badge-warning-alt:hover {
+  background: rgba(249, 115, 22, 0.1);
+}
+
+.filter-tab.badge-warning-alt.active {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+}
+
+.filter-label {
+  white-space: nowrap;
+}
+
 .filter-count {
   background: rgba(255, 255, 255, 0.2);
   padding: 2px 8px;
@@ -288,6 +338,50 @@
   border-color: rgba(59, 130, 246, 0.4);
 }
 
+/* NEW: Special styling for cards that need payment */
+.booking-card.needs-payment {
+  border: 2px solid rgba(245, 158, 11, 0.5);
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(245, 158, 11, 0.05) 100%);
+}
+
+.booking-card.needs-payment:hover {
+  border-color: rgba(245, 158, 11, 0.6);
+}
+
+/* NEW: Styling for expired cards */
+.booking-card.expired-card {
+  border: 2px solid rgba(107, 114, 128, 0.4);
+  background: rgba(15, 23, 42, 0.6);
+  opacity: 0.8;
+}
+
+/* NEW: Card Timer Section */
+.card-timer-section {
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.3) 0%, rgba(217, 119, 6, 0.25) 100%);
+  border-bottom: 2px solid rgba(245, 158, 11, 0.5);
+}
+
+/* NEW: Payment Status Info */
+.payment-status-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+  color: #fbbf24;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.info-icon {
+  font-size: 18px;
+}
+
+.payment-status-info p {
+  margin: 0;
+}
+
 /* Card Header */
 .booking-card-header {
   padding: 20px;
@@ -304,6 +398,13 @@
   font-size: 20px;
   color: #f1f5f9;
   font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.charger-icon {
+  font-size: 22px;
 }
 
 .booking-id {
@@ -320,6 +421,13 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   white-space: nowrap;
+}
+
+.status-badge.reserved,
+.status-badge.payment_pending {
+  background: rgba(245, 158, 11, 0.25);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.5);
 }
 
 .status-badge.confirmed {
@@ -345,6 +453,12 @@
   background: rgba(239, 68, 68, 0.25);
   color: #fca5a5;
   border: 1px solid rgba(239, 68, 68, 0.5);
+}
+
+.status-badge.expired {
+  background: rgba(107, 114, 128, 0.25);
+  color: #9ca3af;
+  border: 1px solid rgba(107, 114, 128, 0.5);
 }
 
 @keyframes pulse {
@@ -420,7 +534,7 @@
   font-weight: 700;
 }
 
-/* Active Indicator */
+/* Status Indicators */
 .active-indicator {
   display: flex;
   align-items: center;
@@ -471,6 +585,31 @@
 
 .upcoming-indicator span:first-child {
   font-size: 18px;
+}
+
+/* NEW: Expired Indicator */
+.expired-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.15) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 13px;
+  margin-top: 8px;
+  text-align: center;
+  flex-direction: column;
+}
+
+.expired-icon {
+  font-size: 20px;
+}
+
+.expired-indicator p {
+  margin: 0;
 }
 
 /* Loading State */
@@ -539,40 +678,6 @@
   font-size: 16px;
   max-width: 500px;
   line-height: 1.6;
-}
-
-/* Cancel Button Styling */
-.cancel-btn {
-  padding: 10px 20px;
-  background: transparent;
-  color: #ef4444;
-  border: 2px solid #ef4444;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 14px;
-  transition: all 0.3s ease;
-  margin-top: 12px;
-  width: 100%;
-}
-
-.cancel-btn:hover {
-  background: #ef4444;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
-}
-
-.cancel-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.cancel-btn:disabled:hover {
-  transform: none;
-  background: transparent;
-  color: #ef4444;
-  box-shadow: none;
 }
 
 /* Responsive Design */
