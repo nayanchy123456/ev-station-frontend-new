@@ -1,0 +1,246 @@
+/* src/css/bookings/receiptModal.css */
+
+.receipt-modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+}
+
+.receipt-modal-content {
+  position: relative;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  border-radius: 24px;
+  padding: 0;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  z-index: 2;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+  animation: modalSlideUp 0.4s ease;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.receipt-container {
+  padding: 32px;
+}
+
+/* Receipt Header */
+.receipt-header {
+  text-align: center;
+  padding-bottom: 24px;
+  border-bottom: 2px dashed rgba(148, 163, 184, 0.3);
+}
+
+.receipt-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  animation: receiptPop 0.6s ease;
+}
+
+@keyframes receiptPop {
+  0% {
+    transform: scale(0) rotate(-180deg);
+  }
+  50% {
+    transform: scale(1.2) rotate(10deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.receipt-header h2 {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.receipt-number {
+  margin: 0;
+  font-size: 14px;
+  color: #94a3b8;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 1px;
+}
+
+/* Receipt Body */
+.receipt-body {
+  padding: 24px 0;
+}
+
+.receipt-section {
+  margin-bottom: 20px;
+}
+
+.section-title {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #cbd5e1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 8px 0;
+  font-size: 14px;
+}
+
+.info-label {
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.info-value {
+  color: #f1f5f9;
+  font-weight: 600;
+  text-align: right;
+  max-width: 60%;
+  word-break: break-word;
+}
+
+.transaction-id {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+}
+
+.receipt-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(148, 163, 184, 0.3),
+    transparent
+  );
+  margin: 20px 0;
+}
+
+/* Receipt Total */
+.receipt-total {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+  border: 2px solid rgba(16, 185, 129, 0.3);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+}
+
+.total-label {
+  font-size: 16px;
+  font-weight: 700;
+  color: #cbd5e1;
+}
+
+.total-value {
+  font-size: 28px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #10b981, #059669);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Receipt Footer */
+.receipt-footer {
+  padding-top: 24px;
+  border-top: 2px dashed rgba(148, 163, 184, 0.3);
+  text-align: center;
+}
+
+.footer-text {
+  margin: 0 0 8px 0;
+  font-size: 12px;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.footer-date {
+  margin: 0;
+  font-size: 11px;
+  color: #64748b;
+}
+
+/* Receipt Actions */
+.receipt-actions {
+  margin-top: 24px;
+}
+
+.download-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 24px rgba(59, 130, 246, 0.3);
+}
+
+.download-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.4);
+}
+
+.download-btn:disabled {
+  background: #475569;
+  cursor: not-allowed;
+  opacity: 0.6;
+  box-shadow: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .receipt-container {
+    padding: 24px 20px;
+  }
+
+  .total-value {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .receipt-container {
+    padding: 20px 16px;
+  }
+
+  .receipt-header h2 {
+    font-size: 20px;
+  }
+
+  .total-label {
+    font-size: 14px;
+  }
+
+  .total-value {
+    font-size: 20px;
+  }
+
+  .info-row {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .info-value {
+    max-width: 100%;
+    text-align: left;
+  }
+}
