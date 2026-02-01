@@ -1,4 +1,4 @@
-/* Book Charger Modal Styles */
+/* Book Charger Modal Styles - FIXED VERSION */
 .book-charger-modal {
   position: fixed;
   top: 0;
@@ -9,6 +9,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: auto; /* Ensure modal can receive events */
 }
 
 .modal-overlay {
@@ -18,7 +19,8 @@
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  pointer-events: auto; /* Allow overlay to receive clicks for closing */
+  /* backdrop-filter removed - was causing blur issues */
 }
 
 .modal-content {
@@ -32,6 +34,8 @@
   padding: 32px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.3s ease;
+  z-index: 10; /* Ensure content is above overlay */
+  pointer-events: auto; /* Ensure content can receive clicks */
 }
 
 @keyframes slideUp {
@@ -61,6 +65,8 @@
   align-items: center;
   justify-content: center;
   color: #6b7280;
+  z-index: 20; /* Above everything else */
+  pointer-events: auto;
 }
 
 .close-btn:hover {
@@ -134,6 +140,7 @@
   justify-content: center;
   font-weight: 600;
   color: #374151;
+  pointer-events: auto;
 }
 
 .nav-btn:hover:not(:disabled) {
@@ -146,6 +153,7 @@
 .nav-btn:disabled {
   opacity: 0.3;
   cursor: not-allowed;
+  pointer-events: none;
 }
 
 .date-title {
@@ -223,6 +231,7 @@
 
 .time-slot.available.clickable {
   cursor: pointer;
+  pointer-events: auto;
 }
 
 .time-slot.available.clickable:hover {
@@ -242,6 +251,7 @@
   border-color: #fecaca;
   cursor: not-allowed;
   opacity: 0.6;
+  pointer-events: none;
 }
 
 .time-slot.past {
@@ -249,6 +259,7 @@
   border-color: #e5e7eb;
   cursor: not-allowed;
   opacity: 0.5;
+  pointer-events: none;
 }
 
 .slot-time {
@@ -366,6 +377,7 @@
   font-size: 14px;
   transition: all 0.2s ease;
   font-family: inherit;
+  pointer-events: auto;
 }
 
 .form-group input[type="datetime-local"]:focus {
@@ -435,6 +447,7 @@
   justify-content: center;
   gap: 8px;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  pointer-events: auto;
 }
 
 .submit-btn:hover:not(:disabled) {
@@ -448,6 +461,7 @@
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+  pointer-events: none;
 }
 
 .submit-btn.disabled {
