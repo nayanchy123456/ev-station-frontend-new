@@ -1,12 +1,36 @@
-// src/components/dashboard/user/sections/ReceiptModal.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import receiptService from "../../../../services/receiptService";
 import "../../../../css/bookings/receiptModal.css";
 
-const ReceiptModal = ({ receipt, onClose }) => {
+const ReceiptModal = ({ bookingId, onClose }) => {
+  const [receipt, setReceipt] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [downloading, setDownloading] = useState(false);
 
+  useEffect(() => {
+    const fetchReceipt = async () => {
+      try {
+        setLoading(true);
+        const receiptData = await receiptService.getReceiptByBooking(bookingId);
+        setReceipt(receiptData);
+        setError(null);
+      } catch (err) {
+        console.error("Failed to fetch receipt:", err);
+        setError(err.message || "Failed to load receipt");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (bookingId) {
+      fetchReceipt();
+    }
+  }, [bookingId]);
+
   const handleDownload = async () => {
+    if (!receipt) return;
+    
     setDownloading(true);
     try {
       await receiptService.downloadReceipt(receipt.receiptId);
@@ -19,8 +43,61 @@ const ReceiptModal = ({ receipt, onClose }) => {
   };
 
   const formatCurrency = (amount) => {
-    return `Rs ${parseFloat(amount).toFixed(2)}`;
+    return `NPR ${parseFloat(amount).toFixed(2)}`;
   };
+
+  if (loading) {
+    return (
+      <div className="receipt-modal">
+        <div className="modal-overlay" onClick={onClose}></div>
+        <div className="modal-content receipt-modal-content">
+          <button className="close-btn" onClick={onClose}>✖</button>
+          <div className="receipt-loading">
+            <div className="spinner"></div>
+            <p>Loading receipt...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="receipt-modal">
+        <div className="modal-overlay" onClick={onClose}></div>
+        <div className="modal-content receipt-modal-content">
+          <button className="close-btn" onClick={onClose}>✖</button>
+          <div className="receipt-error">
+            <div className="error-icon">❌</div>
+            <h3>Unable to Load Receipt</h3>
+            <p>{error}</p>
+            <button className="btn-primary" onClick={onClose}>
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!receipt) {
+    return (
+      <div className="receipt-modal">
+        <div className="modal-overlay" onClick={onClose}></div>
+        <div className="modal-content receipt-modal-content">
+          <button className="close-btn" onClick={onClose}>✖</button>
+          <div className="receipt-error">
+            <div className="error-icon">📄</div>
+            <h3>Receipt Not Found</h3>
+            <p>No receipt available for this booking</p>
+            <button className="btn-primary" onClick={onClose}>
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="receipt-modal">
@@ -58,6 +135,10 @@ const ReceiptModal = ({ receipt, onClose }) => {
             <div className="receipt-section">
               <h3 className="section-title">Booking Details</h3>
               <div className="info-row">
+                <span className="info-label">Booking ID:</span>
+                <span className="info-value">#{receipt.bookingId}</span>
+              </div>
+              <div className="info-row">
                 <span className="info-label">Charger:</span>
                 <span className="info-value">{receipt.chargerName}</span>
               </div>
@@ -85,6 +166,10 @@ const ReceiptModal = ({ receipt, onClose }) => {
 
             <div className="receipt-section">
               <h3 className="section-title">Payment Information</h3>
+              <div className="info-row">
+                <span className="info-label">Payment ID:</span>
+                <span className="info-value">#{receipt.paymentId}</span>
+              </div>
               <div className="info-row">
                 <span className="info-label">Payment Method:</span>
                 <span className="info-value">{receipt.paymentMethod}</span>
@@ -140,6 +225,12 @@ const ReceiptModal = ({ receipt, onClose }) => {
                   📥 Download Receipt
                 </>
               )}
+            </button>
+            <button 
+              className="print-btn"
+              onClick={() => window.print()}
+            >
+              🖨️ Print Receipt
             </button>
           </div>
         </div>
