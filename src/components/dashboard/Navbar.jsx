@@ -1,15 +1,40 @@
-import React, { useState } from "react";
-import "../../css/navbar.css";
+import React, { useState, useEffect } from "react";
 import { FaBars, FaBell, FaSearch } from "react-icons/fa";
+import notificationService from "../../services/notificationService";
+import "../../css/navbar.css";
+import NotificationDropdown from "./NotificationDropDown";
 
 const Navbar = ({ toggleSidebar, sidebarCollapsed, onSearch }) => {
   const [searchFocused, setSearchFocused] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const user = JSON.parse(localStorage.getItem("user")) || { 
     firstName: "John", 
     lastName: "Doe", 
     role: "USER" 
+  };
+
+  // Fetch unread notification count on mount and periodically
+  useEffect(() => {
+    fetchUnreadCount();
+    
+    // Poll for new notifications every 30 seconds
+    const interval = setInterval(() => {
+      fetchUnreadCount();
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const fetchUnreadCount = async () => {
+    try {
+      const count = await notificationService.getUnreadCount();
+      setUnreadCount(count);
+    } catch (error) {
+      console.error("Failed to fetch unread count:", error);
+    }
   };
 
   const getInitials = () => {
@@ -30,21 +55,27 @@ const Navbar = ({ toggleSidebar, sidebarCollapsed, onSearch }) => {
   };
 
   const handleSearch = () => {
-    // Trim whitespace and validate
     const trimmedQuery = searchQuery.trim();
     
     if (trimmedQuery && onSearch) {
-      // Only search if there's actual content
       onSearch({ query: trimmedQuery });
     } else if (!trimmedQuery && onSearch) {
-      // Optional: handle empty search (clear results, show all, etc.)
       onSearch({ query: "" });
     }
   };
 
-  // Optional: Add click handler for search icon
   const handleSearchClick = () => {
     handleSearch();
+  };
+
+  const toggleNotifications = () => {
+    setShowNotifications(prev => !prev);
+  };
+
+  const handleCloseNotifications = () => {
+    setShowNotifications(false);
+    // Refresh unread count when closing
+    fetchUnreadCount();
   };
 
   return (
@@ -63,7 +94,7 @@ const Navbar = ({ toggleSidebar, sidebarCollapsed, onSearch }) => {
         <div className={`search-container ${searchFocused ? 'focused' : ''}`}>
           <FaSearch 
             className="search-icon" 
-            onClick={handleSearchClick} // Make icon clickable
+            onClick={handleSearchClick}
             style={{ cursor: 'pointer' }}
           />
           <input 
@@ -80,10 +111,20 @@ const Navbar = ({ toggleSidebar, sidebarCollapsed, onSearch }) => {
       </div>
 
       <div className="navbar-right">
-        <button className="notification-btn">
+        <button 
+          className="notification-btn"
+          onClick={toggleNotifications}
+        >
           <FaBell />
-          <span className="notification-badge">3</span>
+          {unreadCount > 0 && (
+            <span className="notification-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
+          )}
         </button>
+        
+        <NotificationDropdown
+          isOpen={showNotifications}
+          onClose={handleCloseNotifications}
+        />
         
         <div className="navbar-user">
           <div className="user-info">

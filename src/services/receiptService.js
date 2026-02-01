@@ -75,6 +75,29 @@ const receiptService = {
   },
 
   /**
+   * Format receipt date (alias for formatReceiptDateTime)
+   */
+  formatReceiptDate: (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  },
+
+  /**
+   * Format receipt number with prefix
+   */
+  formatReceiptNumber: (receiptNumber) => {
+    if (!receiptNumber) return "N/A";
+    return `Receipt #${receiptNumber}`;
+  },
+
+  /**
    * Calculate duration in minutes
    */
   calculateDuration: (startTime, endTime) => {
