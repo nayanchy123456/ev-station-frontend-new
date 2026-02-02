@@ -51,11 +51,12 @@ const BookCharger = ({ charger, onBookingSuccess, onClose }) => {
     });
   };
 
-  const isTimeSlotBooked = (date, hour) => {
+  // UPDATED: Check if a 30-minute time slot is booked
+  const isTimeSlotBooked = (date, hour, minute) => {
     const slotStart = new Date(date);
-    slotStart.setHours(hour, 0, 0, 0);
+    slotStart.setHours(hour, minute, 0, 0);
     const slotEnd = new Date(slotStart);
-    slotEnd.setHours(hour + 1, 0, 0, 0);
+    slotEnd.setMinutes(slotEnd.getMinutes() + 30); // 30-minute slots
 
     return existingBookings.some(booking => {
       const bookingStart = new Date(booking.startTime);
@@ -64,18 +65,20 @@ const BookCharger = ({ charger, onBookingSuccess, onClose }) => {
     });
   };
 
-  const isPastTime = (date, hour) => {
+  // UPDATED: Check if a 30-minute time slot is in the past
+  const isPastTime = (date, hour, minute) => {
     const slotTime = new Date(date);
-    slotTime.setHours(hour, 0, 0, 0);
-    return slotTime < new Date(Date.now() + 15 * 60000);
+    slotTime.setHours(hour, minute, 0, 0);
+    return slotTime < new Date(Date.now() + 15 * 60000); // 15 minutes advance required
   };
 
-  const handleSlotClick = (hour) => {
+  // UPDATED: Handle slot click with 30-minute precision, default 1-hour booking
+  const handleSlotClick = (hour, minute) => {
     const start = new Date(selectedDate);
-    start.setHours(hour, 0, 0, 0);
+    start.setHours(hour, minute, 0, 0);
     
     const end = new Date(start);
-    end.setHours(hour + 2, 0, 0, 0);
+    end.setHours(start.getHours() + 1); // Default 1-hour booking (changed from 2 hours)
 
     const formatDateTime = (date) => {
       const year = date.getFullYear();
@@ -190,7 +193,12 @@ const BookCharger = ({ charger, onBookingSuccess, onClose }) => {
     }
   };
 
-  const hours = Array.from({ length: 24 }, (_, i) => i);
+  // UPDATED: Generate 48 time slots (30-minute intervals)
+  const timeSlots = Array.from({ length: 48 }, (_, i) => ({
+    hour: Math.floor(i / 2),
+    minute: (i % 2) * 30,
+    index: i
+  }));
 
   return (
     <>
@@ -250,15 +258,18 @@ const BookCharger = ({ charger, onBookingSuccess, onClose }) => {
               </div>
             ) : (
               <div className="time-grid">
-                {hours.map(hour => {
-                  const isBooked = isTimeSlotBooked(selectedDate, hour);
-                  const isPast = isPastTime(selectedDate, hour);
+                {timeSlots.map(slot => {
+                  const isBooked = isTimeSlotBooked(selectedDate, slot.hour, slot.minute);
+                  const isPast = isPastTime(selectedDate, slot.hour, slot.minute);
                   const isAvailable = !isBooked && !isPast;
+                  
+                  // Format display time
+                  const displayTime = `${slot.hour.toString().padStart(2, '0')}:${slot.minute.toString().padStart(2, '0')}`;
                   
                   return (
                     <div
-                      key={hour}
-                      onClick={() => isAvailable && handleSlotClick(hour)}
+                      key={slot.index}
+                      onClick={() => isAvailable && handleSlotClick(slot.hour, slot.minute)}
                       className={`time-slot ${
                         isPast ? 'past' : 
                         isBooked ? 'booked' : 
@@ -267,11 +278,11 @@ const BookCharger = ({ charger, onBookingSuccess, onClose }) => {
                       title={
                         isPast ? 'Time has passed' :
                         isBooked ? 'Already booked' :
-                        'Click to select'
+                        'Click to select (1-hour default)'
                       }
                     >
                       <div className="slot-time">
-                        {hour.toString().padStart(2, '0')}:00
+                        {displayTime}
                       </div>
                       <div className="slot-status">
                         {isPast ? '⏱️' : isBooked ? '🔒' : '✓'}
