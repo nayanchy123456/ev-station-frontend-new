@@ -38,6 +38,16 @@ const Login = () => {
         JSON.stringify({ role, email: userEmail, firstName, lastName, phone, createdAt })
       );
 
+      // ✅ FIX: Extract userId and role from JWT token and save to localStorage
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        localStorage.setItem('userId', payload.userId.toString());
+        localStorage.setItem('role', payload.role);
+        console.log('✅ Saved to localStorage - UserId:', payload.userId, 'Role:', payload.role);
+      } catch (decodeError) {
+        console.error('Failed to decode token:', decodeError);
+      }
+
       // Redirect based on role
       if (role === "ADMIN") navigate("/admin-dashboard");
       else if (role === "HOST") navigate("/host-dashboard");

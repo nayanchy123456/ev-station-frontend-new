@@ -1,4 +1,4 @@
-// src/App.jsx - UPDATED with MyBookings route
+// src/App.jsx - UPDATED with Chat/Messages routes
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
@@ -8,19 +8,22 @@ import DashboardLayout from "./components/dashboard/DashboardLayout";
 // User Sections
 import ChargerList from "./components/dashboard/user/sections/ChargerList";
 import ChargerDetail from "./components/dashboard/user/sections/ChargerDetail";
-import MyBookings from "./components/dashboard/user/sections/MyBookings"; // NEW
+import MyBookings from "./components/dashboard/user/sections/MyBookings";
+import UserMessages from "./components/dashboard/user/sections/UserMessages"; // ⭐ NEW
 
 // Host Sections
 import HostChargers from "./components/dashboard/host/sections/HostChargers";
 import AddCharger from "./components/dashboard/host/sections/AddCharger";
 import EditCharger from "./components/dashboard/host/sections/EditCharger";
 import HostBookings from "./components/dashboard/host/sections/HostBookings";
+import HostMessages from "./components/dashboard/host/sections/HostMessages"; // ⭐ NEW
 
 // Admin Sections
 import UsersManagement from "./components/dashboard/admin/sections/UsersManagement";
 import HostsManagement from "./components/dashboard/admin/sections/HostsManagement";
 import AllChargers from "./components/dashboard/admin/sections/AllChargers";
 import AdminReports from "./components/dashboard/admin/sections/AdminReports";
+import AdminMessages from "./components/dashboard/admin/sections/AdminMessages"; // ⭐ NEW
 
 function App() {
   return (
@@ -41,7 +44,8 @@ function App() {
         >
           <Route path="chargers" element={<ChargerList />} />
           <Route path="charger/:id" element={<ChargerDetail />} />
-          <Route path="my-bookings" element={<MyBookings />} /> {/* NEW */}
+          <Route path="my-bookings" element={<MyBookings />} />
+          <Route path="messages" element={<UserMessages />} /> {/* ⭐ NEW */}
           <Route path="profile" element={<div>User Profile</div>} />
           <Route path="payments" element={<div>User Payments</div>} />
           <Route path="support" element={<div>User Support</div>} />
@@ -61,6 +65,7 @@ function App() {
           <Route path="add-charger" element={<AddCharger />} />
           <Route path="edit-charger/:id" element={<EditCharger />} />
           <Route path="bookings" element={<HostBookings />} />
+          <Route path="messages" element={<HostMessages />} /> {/* ⭐ NEW */}
           <Route path="payments" element={<div>Host Payments</div>} />
           <Route path="support" element={<div>Host Support</div>} />
           <Route index element={<div>Welcome to Host Dashboard</div>} />
@@ -78,6 +83,7 @@ function App() {
           <Route path="users" element={<UsersManagement />} />
           <Route path="hosts" element={<HostsManagement />} />
           <Route path="chargers" element={<AllChargers />} />
+          <Route path="messages" element={<AdminMessages />} /> {/* ⭐ NEW */}
           <Route path="reports" element={<AdminReports />} />
           <Route path="support" element={<div>Admin Support</div>} />
           <Route index element={<div>Welcome to Admin Dashboard</div>} />

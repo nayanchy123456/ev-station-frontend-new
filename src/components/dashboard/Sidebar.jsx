@@ -16,34 +16,41 @@ import {
   FaTimes,
   FaCalendarCheck
 } from "react-icons/fa";
+import { FiMessageSquare } from "react-icons/fi"; // ⭐ NEW - Message icon
 
 const Sidebar = ({ role, setActiveSection, activeSection, handleLogout, collapsed, toggleSidebar }) => {
 
+  // ⭐ UPDATED - Added Messages to User Menu
   const userMenu = [
     { key: "dashboard", icon: <FaHome />, label: "Dashboard" },
     { key: "profile", icon: <FaUser />, label: "Profile" },
     { key: "chargers", icon: <FaChargingStation />, label: "Find Chargers" },
     { key: "bookings", icon: <FaCalendarCheck />, label: "My Bookings" },
+    { key: "messages", icon: <FiMessageSquare />, label: "Messages" }, // ⭐ NEW
     { key: "payments", icon: <FaMoneyBillAlt />, label: "Payments" },
     { key: "support", icon: <FaLifeRing />, label: "Support" },
     { key: "settings", icon: <FaCog />, label: "Settings" }
   ];
 
+  // ⭐ UPDATED - Added Messages to Host Menu
   const hostMenu = [
     { key: "dashboard", icon: <FaHome />, label: "Dashboard" },
     { key: "myChargers", icon: <FaChargingStation />, label: "My Chargers" },
     { key: "addCharger", icon: <FaPlus />, label: "Add Charger" },
     { key: "bookings", icon: <FaClipboardList />, label: "Bookings" },
+    { key: "messages", icon: <FiMessageSquare />, label: "Messages" }, // ⭐ NEW
     { key: "payments", icon: <FaMoneyBillAlt />, label: "Payments" },
     { key: "support", icon: <FaLifeRing />, label: "Support" },
     { key: "settings", icon: <FaCog />, label: "Settings" }
   ];
 
+  // ⭐ UPDATED - Added Messages to Admin Menu
   const adminMenu = [
     { key: "dashboard", icon: <FaHome />, label: "Dashboard" },
     { key: "users", icon: <FaUsers />, label: "Users Management" },
     { key: "hosts", icon: <FaUsers />, label: "Hosts Management" },
     { key: "chargers", icon: <FaChargingStation />, label: "All Chargers" },
+    { key: "messages", icon: <FiMessageSquare />, label: "Messages" }, // ⭐ NEW
     { key: "reports", icon: <FaChartBar />, label: "Reports" },
     { key: "support", icon: <FaLifeRing />, label: "Support" },
     { key: "settings", icon: <FaCog />, label: "Settings" }

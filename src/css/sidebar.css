@@ -12,7 +12,7 @@
 /* Sidebar Container */
 .sidebar {
   width: 260px;
-  background: #0f172a;
+  background: #0f172a; /* EXACT match with navbar */
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -25,11 +25,11 @@
   top: 0;
   left: 0;
   z-index: 1000;
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  border-right: 1px solid rgba(255, 255, 255, 0.1); /* Matches navbar border */
   overflow: hidden;
 }
 
-/* Gradient accent at top */
+/* Gradient accent at top - EXACT match with navbar */
 .sidebar::before {
   content: '';
   position: absolute;
@@ -57,14 +57,15 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   gap: 12px;
   flex-shrink: 0;
-  min-height: 80px;
+  min-height: 70px; /* MATCHES navbar height exactly */
+  height: 70px; /* Fixed height to align with navbar */
 }
 
 .sidebar.collapsed .sidebar-header {
   flex-direction: column;
   justify-content: center;
-  padding: 20px 8px;
-  gap: 12px;
+  padding: 15px 8px;
+  gap: 8px;
 }
 
 /* Dashboard Title */
@@ -85,7 +86,7 @@
 }
 
 .sidebar.collapsed .dashboard-title {
-  font-size: 14px;
+  font-size: 12px;
   white-space: normal;
   text-align: center;
   line-height: 1.1;

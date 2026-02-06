@@ -1,296 +1,318 @@
-.charger-detail-container {
-  padding: 20px 40px;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #0a1929 0%, #1a2332 50%, #0d1b2a 100%);
-  color: #f1f5f9;
+/* ============================================
+   HOST CONTACT SECTION STYLES
+   Add these to your chargerDetail.css file
+   ============================================ */
+
+/* Host Contact Card */
+.host-contact-card {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  margin-bottom: 24px;
   position: relative;
+  overflow: hidden;
 }
 
-.charger-detail-header {
+.host-contact-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.host-contact-card h3 {
+  color: var(--text-primary, #e2e8f0);
+  margin-bottom: 16px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Host Info Container */
+.host-info {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 20px;
-}
-
-.back-btn {
-  background: #3b82f6;
-  color: white;
-  padding: 8px 16px;
-  border-radius: 12px;
-  border: none;
-  cursor: pointer;
-  width: fit-content;
-  transition: all 0.3s ease;
-}
-
-.back-btn:hover {
-  background: #2563eb;
-  transform: translateY(-2px);
-}
-
-.charger-detail-header h2 {
-  margin: 0;
-  font-size: 28px;
-}
-
-.charger-detail-header .location {
-  color: #60a5fa;
-  font-size: 16px;
-}
-
-.charger-detail-content {
-  display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
-  margin-bottom: 30px;
-}
-
-.charger-images {
-  display: flex;
+  justify-content: space-between;
+  align-items: center;
   gap: 16px;
-  overflow-x: auto;
-  padding-bottom: 10px;
-  flex: 1 1 400px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
 }
 
-.charger-images img {
-  width: 400px;
-  height: 250px;
-  object-fit: cover;
-  border-radius: 16px;
+.host-details {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.host-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
   flex-shrink: 0;
-  transition: transform 0.3s ease;
 }
 
-.charger-images img:hover {
+.host-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.host-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary, #e2e8f0);
+  margin: 0 0 4px;
+  text-transform: capitalize;
+}
+
+.host-email {
+  font-size: 14px;
+  color: var(--text-secondary, #94a3b8);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Contact Host Button */
+.contact-host-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+
+.contact-host-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.contact-host-btn:hover::before {
+  left: 100%;
+}
+
+.contact-host-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+.contact-host-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.contact-host-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Contact Hint */
+.contact-hint {
+  font-size: 13px;
+  color: var(--text-secondary, #94a3b8);
+  margin: 0;
+  padding: 12px;
+  background: rgba(102, 126, 234, 0.05);
+  border-radius: 8px;
+  border-left: 3px solid rgba(102, 126, 234, 0.4);
+}
+
+/* Action Buttons Container */
+.action-buttons-container {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.book-now-btn.primary {
+  flex: 1;
+  min-width: 200px;
+}
+
+.contact-host-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: rgba(51, 65, 85, 0.6);
+  color: var(--text-primary, #e2e8f0);
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  white-space: nowrap;
+}
+
+.contact-host-btn-secondary:hover:not(:disabled) {
+  background: rgba(102, 126, 234, 0.2);
+  border-color: rgba(102, 126, 234, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.contact-host-btn-secondary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.contact-host-btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Status Badge */
+.status-available {
+  color: #86efac !important;
+  font-weight: 600;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 768px) {
+  .host-info {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .host-details {
+    width: 100%;
+  }
+
+  .contact-host-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .action-buttons-container {
+    flex-direction: column;
+  }
+
+  .book-now-btn.primary {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .contact-host-btn-secondary {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .host-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .host-name {
+    font-size: 15px;
+  }
+
+  .host-email {
+    font-size: 13px;
+  }
+
+  .contact-host-btn,
+  .contact-host-btn-secondary {
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+
+  .contact-hint {
+    font-size: 12px;
+    padding: 10px;
+  }
+}
+
+/* ============================================
+   ALTERNATIVE FLOATING BUTTON STYLE
+   (Optional - for quick access)
+   ============================================ */
+
+.floating-contact-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 999;
+}
+
+.floating-contact-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 12px 32px rgba(102, 126, 234, 0.5);
+}
+
+.floating-contact-btn:active {
   transform: scale(1.05);
 }
 
-.charger-info {
-  flex: 1 1 300px;
-  background: rgba(15, 23, 42, 0.8);
-  padding: 20px;
-  border-radius: 16px;
-  backdrop-filter: blur(10px);
-}
-
-.charger-info h3 {
-  margin-top: 0;
-  color: #60a5fa;
-}
-
-.charger-info p {
-  margin: 10px 0;
-  font-size: 15px;
-  opacity: 0.9;
-}
-
-.book-btn {
-  background: #10b981;
+/* Badge for unread messages (if needed) */
+.floating-contact-btn .badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 20px;
+  height: 20px;
+  background: #ef4444;
   color: white;
-  padding: 12px 24px;
-  border-radius: 16px;
-  border: none;
-  cursor: pointer;
-  margin-top: 12px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.book-btn:hover {
-  background: #059669;
-  transform: translateY(-2px);
-}
-
-.charger-map {
-  width: 100%;
-  height: 400px;
-  border-radius: 16px;
-  overflow: hidden;
-  margin-top: 20px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
-}
-
-.map {
-  width: 100%;
-  height: 100%;
-}
-
-.status-message {
-  color: #94a3b8;
-  text-align: center;
-  margin: 20px 0;
-}
-
-.charger-detail-loading,
-.charger-detail-error {
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 60vh;
-  gap: 16px;
+  border: 2px solid white;
 }
 
-.spinner {
-  border: 5px solid #f3f3f3;
-  border-top: 5px solid #3b82f6;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg);}
-  100% { transform: rotate(360deg);}
-}
-
-/* Responsive */
 @media (max-width: 768px) {
-  .charger-detail-content {
-    flex-direction: column;
-  }
-
-  .charger-images img {
-    width: 100%;
-    height: 200px;
+  .floating-contact-btn {
+    bottom: 20px;
+    right: 20px;
+    width: 52px;
+    height: 52px;
   }
 }
-
-
-/* Charger Info Section */
-.charger-info-section {
-  flex: 1 1 400px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-/* Info Card Styling */
-.info-card {
-  background: rgba(15, 23, 42, 0.9);
-  padding: 20px;
-  border-radius: 16px;
-  backdrop-filter: blur(12px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.info-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
-}
-
-.info-card h3 {
-  margin: 0 0 12px 0;
-  color: #3b82f6;
-  font-size: 20px;
-  border-bottom: 1px solid rgba(96, 165, 250, 0.3);
-  padding-bottom: 6px;
-}
-
-.info-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px 20px;
-}
-
-.info-item {
-  display: flex;
-  flex-direction: column;
-}
-
-.info-label {
-  font-size: 14px;
-  color: #94a3b8;
-  margin-bottom: 4px;
-}
-
-.info-value {
-  font-size: 16px;
-  font-weight: 600;
-  color: #f1f5f9;
-}
-
-.info-value.price {
-  color: #10b981;
-}
-
-/* Pricing Estimate Card */
-.pricing-estimate {
-  background: rgba(15, 23, 42, 0.85);
-  padding: 20px;
-  border-radius: 16px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-}
-
-.pricing-estimate h4 {
-  margin: 0 0 12px 0;
-  color: #facc15;
-  font-size: 18px;
-}
-
-.estimate-grid {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.estimate-item {
-  flex: 1 1 80px;
-  background: rgba(31, 41, 55, 0.8);
-  padding: 10px 12px;
-  border-radius: 12px;
-  text-align: center;
-  transition: transform 0.3s ease, background 0.3s ease;
-  cursor: default;
-}
-
-.estimate-item:hover {
-  transform: translateY(-2px);
-  background: rgba(31, 41, 55, 0.95);
-}
-
-.estimate-item strong {
-  display: block;
-  margin-top: 4px;
-  color: #10b981;
-}
-
-.estimate-note {
-  font-size: 13px;
-  color: #94a3b8;
-  margin-top: 8px;
-}
-
-/* Book Now Button */
-.book-now-btn {
-  background: #3b82f6;
-  color: #fff;
-  padding: 14px 24px;
-  border-radius: 16px;
-  font-weight: 600;
-  text-align: center;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 12px;
-}
-
-.book-now-btn:hover {
-  background: #2563eb;
-  transform: translateY(-2px);
-}
-
-/* Responsive Adjustments */
-@media (max-width: 1024px) {
-  .charger-detail-content {
-    flex-direction: column;
-  }
-  .charger-info-section {
-    flex: 1 1 auto;
-  }
-}
-

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { FiMessageCircle, FiUser, FiMail } from "react-icons/fi"; // Add icons
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
@@ -30,6 +31,7 @@ const ChargerDetail = () => {
   const [error, setError] = useState("");
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [initiatingChat, setInitiatingChat] = useState(false); // NEW: Track chat initiation
 
   useEffect(() => {
     fetchChargerDetails();
@@ -63,6 +65,35 @@ const ChargerDetail = () => {
       });
       window.dispatchEvent(event);
     }, 100);
+  };
+
+  // ✅ NEW: Handle Contact Host
+  const handleContactHost = async () => {
+    if (!charger || !charger.hostId) {
+      console.error("❌ No host information available");
+      return;
+    }
+
+    setInitiatingChat(true);
+
+    try {
+      // Option 1: Navigate to ChatDashboard with host info
+      // The ChatDashboard will handle conversation initiation
+      navigate("/user-dashboard", {
+        state: {
+          navigateTo: "chat",
+          hostId: charger.hostId,
+          hostEmail: charger.hostEmail,
+          chargerId: charger.id,
+          chargerName: charger.name
+        }
+      });
+    } catch (err) {
+      console.error("❌ Error initiating chat:", err);
+      setError("Failed to start conversation. Please try again.");
+    } finally {
+      setInitiatingChat(false);
+    }
   };
 
   if (loading) {
@@ -150,6 +181,37 @@ const ChargerDetail = () => {
 
         {/* Charger Info */}
         <div className="charger-info-section">
+          {/* ✅ NEW: Host Contact Card */}
+          <div className="info-card host-contact-card">
+            <h3>Host Information</h3>
+            <div className="host-info">
+              <div className="host-details">
+                <div className="host-avatar">
+                  <FiUser size={24} />
+                </div>
+                <div className="host-text">
+                  <p className="host-name">
+                    {charger.hostName || charger.hostEmail?.split('@')[0] || 'Host'}
+                  </p>
+                  <p className="host-email">
+                    <FiMail size={14} /> {charger.hostEmail}
+                  </p>
+                </div>
+              </div>
+              <button 
+                className="contact-host-btn"
+                onClick={handleContactHost}
+                disabled={initiatingChat}
+              >
+                <FiMessageCircle size={18} />
+                {initiatingChat ? 'Opening Chat...' : 'Contact Host'}
+              </button>
+            </div>
+            <p className="contact-hint">
+              💬 Have questions? Message the host directly about availability, pricing, or charger details.
+            </p>
+          </div>
+
           <div className="info-card">
             <h3>Charger Details</h3>
             <div className="info-grid">
@@ -170,8 +232,10 @@ const ChargerDetail = () => {
                 </span>
               </div>
               <div className="info-item">
-                <span className="info-label">Host</span>
-                <span className="info-value">{charger.hostEmail}</span>
+                <span className="info-label">Status</span>
+                <span className="info-value status-available">
+                  ✓ Available
+                </span>
               </div>
             </div>
           </div>
@@ -197,12 +261,23 @@ const ChargerDetail = () => {
             </p>
           </div>
 
-          <button
-            className="book-now-btn"
-            onClick={() => setShowBookingModal(true)}
-          >
-            ⚡ Book This Charger
-          </button>
+          {/* Action Buttons */}
+          <div className="action-buttons-container">
+            <button
+              className="book-now-btn primary"
+              onClick={() => setShowBookingModal(true)}
+            >
+              ⚡ Book This Charger
+            </button>
+            <button
+              className="contact-host-btn-secondary"
+              onClick={handleContactHost}
+              disabled={initiatingChat}
+            >
+              <FiMessageCircle size={18} />
+              Ask a Question
+            </button>
+          </div>
         </div>
       </div>
 
