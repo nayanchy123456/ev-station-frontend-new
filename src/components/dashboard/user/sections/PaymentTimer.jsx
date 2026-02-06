@@ -3,6 +3,13 @@ import React, { useState, useEffect } from "react";
 import reservationService from "../../../../services/reservationService";
 import "../../../../css/bookings/paymentTimer.css";
 
+/**
+ * ✅ UPDATED: Changed from 10-minute to 3-minute reservation timeout
+ * 
+ * Payment Timer Component
+ * Displays countdown timer for reservation expiry
+ * Shows warning when less than 1 minute remaining
+ */
 const PaymentTimer = ({ reservedUntil, onExpire, showWarning = true }) => {
   const [timeLeft, setTimeLeft] = useState({ minutes: 0, seconds: 0 });
   const [isExpiringSoon, setIsExpiringSoon] = useState(false);
@@ -33,7 +40,9 @@ const PaymentTimer = ({ reservedUntil, onExpire, showWarning = true }) => {
   // Format time as MM:SS
   const formattedTime = `${timeLeft.minutes}:${String(timeLeft.seconds).padStart(2, '0')}`;
   const totalSeconds = timeLeft.totalSeconds || 0;
-  const percentage = Math.min(100, (totalSeconds / 600) * 100); // 600 seconds = 10 minutes
+  
+  // ✅ CHANGED: 180 seconds = 3 minutes (was 600 seconds = 10 minutes)
+  const percentage = Math.min(100, (totalSeconds / 180) * 100);
 
   if (timeLeft.expired) {
     return (
@@ -64,7 +73,8 @@ const PaymentTimer = ({ reservedUntil, onExpire, showWarning = true }) => {
       </div>
       {showWarning && isExpiringSoon && (
         <div className="timer-warning">
-          ⚠️ Less than 2 minutes remaining!
+          {/* ✅ CHANGED: Warning message updated for 3-minute timeout */}
+          ⚠️ Less than 1 minute remaining!
         </div>
       )}
     </div>

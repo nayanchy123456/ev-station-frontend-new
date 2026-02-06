@@ -3,7 +3,7 @@ import api from "./api.js";
 
 const reservationService = {
   /**
-   * Create a new reservation (10-minute window)
+   * Create a new reservation (3-minute window)
    */
   createReservation: async (reservationData) => {
     try {
