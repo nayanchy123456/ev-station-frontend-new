@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import { FiMessageCircle, FiUser, FiMail } from "react-icons/fi"; // Add icons
+import { FiMessageCircle, FiUser, FiMail } from "react-icons/fi";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
 import api from "../../../../services/api";
 import BookCharger from "./BookCharger";
+import ChargerRatingSummary from "../../../rating/ChargerRatingSummary.jsx";
+import ReviewsList from "../../../rating/ReviewsList.jsx";
 import "../../../../css/chargerDetail.css";
 
 /* ✅ FIX: Import leaflet marker images (Vite-compatible) */
@@ -31,7 +33,7 @@ const ChargerDetail = () => {
   const [error, setError] = useState("");
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
-  const [initiatingChat, setInitiatingChat] = useState(false); // NEW: Track chat initiation
+  const [initiatingChat, setInitiatingChat] = useState(false);
 
   useEffect(() => {
     fetchChargerDetails();
@@ -67,7 +69,6 @@ const ChargerDetail = () => {
     }, 100);
   };
 
-  // ✅ NEW: Handle Contact Host
   const handleContactHost = async () => {
     if (!charger || !charger.hostId) {
       console.error("❌ No host information available");
@@ -77,8 +78,6 @@ const ChargerDetail = () => {
     setInitiatingChat(true);
 
     try {
-      // Option 1: Navigate to ChatDashboard with host info
-      // The ChatDashboard will handle conversation initiation
       navigate("/user-dashboard", {
         state: {
           navigateTo: "chat",
@@ -181,7 +180,7 @@ const ChargerDetail = () => {
 
         {/* Charger Info */}
         <div className="charger-info-section">
-          {/* ✅ NEW: Host Contact Card */}
+          {/* Host Contact Card */}
           <div className="info-card host-contact-card">
             <h3>Host Information</h3>
             <div className="host-info">
@@ -223,12 +222,6 @@ const ChargerDetail = () => {
                 <span className="info-label">Price per kWh</span>
                 <span className="info-value price">
                   Rs {charger.pricePerKwh}
-                </span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">Rating</span>
-                <span className="info-value">
-                  ⭐ {charger.rating.toFixed(1)}
                 </span>
               </div>
               <div className="info-item">
@@ -279,6 +272,17 @@ const ChargerDetail = () => {
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Rating Summary Section */}
+      <div className="charger-ratings-section">
+        <h3>⭐ Ratings & Reviews</h3>
+        <ChargerRatingSummary chargerId={charger.id} />
+      </div>
+
+      {/* Reviews List Section */}
+      <div className="charger-reviews-section">
+        <ReviewsList chargerId={charger.id} />
       </div>
 
       {/* Map */}

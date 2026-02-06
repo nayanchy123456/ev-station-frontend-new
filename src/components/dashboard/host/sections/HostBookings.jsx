@@ -248,11 +248,12 @@ const HostBookings = () => {
   );
 };
 
-// BookingCard Component
+// ⭐ UPDATED BookingCard Component with Rating Display
 const BookingCard = ({ booking, onRefresh }) => {
   const statusColor = bookingService.getStatusColor(booking.status);
   const needsPayment = booking.status === "RESERVED" || booking.status === "PAYMENT_PENDING";
   const isExpired = booking.status === "EXPIRED";
+  const hasRating = booking.ratingId && booking.ratingScore; // ⭐ NEW
 
   const formatDateTime = (dateString) => {
     const date = new Date(dateString);
@@ -268,6 +269,19 @@ const BookingCard = ({ booking, onRefresh }) => {
   const calculateDuration = (start, end) => {
     const duration = bookingService.calculateDuration(start, end);
     return bookingService.formatDuration(duration);
+  };
+
+  // ⭐ NEW - Function to render star rating
+  const renderStarRating = (score) => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      stars.push(
+        <span key={i} className={i <= score ? "star filled" : "star empty"}>
+          ⭐
+        </span>
+      );
+    }
+    return stars;
   };
 
   return (
@@ -364,6 +378,30 @@ const BookingCard = ({ booking, onRefresh }) => {
               <span className="detail-value total-price">
                 NPR {parseFloat(booking.totalPrice).toFixed(2)}
               </span>
+            </div>
+          </div>
+        )}
+
+        {/* ⭐ NEW - Rating Display Section */}
+        {hasRating && (
+          <div className="rating-display-section">
+            <div className="rating-header">
+              <span className="rating-icon">⭐</span>
+              <span className="rating-title">Customer Rating</span>
+            </div>
+            <div className="rating-content">
+              <div className="rating-stars">
+                {renderStarRating(booking.ratingScore)}
+                <span className="rating-score">{booking.ratingScore}/5</span>
+              </div>
+              {booking.ratingComment && (
+                <div className="rating-comment">
+                  <p>"{booking.ratingComment}"</p>
+                </div>
+              )}
+              <div className="rating-timestamp">
+                Rated on {formatDateTime(booking.ratingCreatedAt)}
+              </div>
             </div>
           </div>
         )}

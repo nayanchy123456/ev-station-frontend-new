@@ -5,6 +5,7 @@ import PaymentModal from "./PaymentModal";
 import PaymentTimer from "./PaymentTimer";
 import ReceiptModal from "./ReceiptModal";
 import "../../../../css/bookings/myBookings.css";
+import RatingButton from "../../../rating/RatingButton.jsx";
 
 const MyBookings = () => {
   const [bookings, setBookings] = useState([]);
@@ -12,7 +13,7 @@ const MyBookings = () => {
   const [filter, setFilter] = useState("ALL");
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [showReceiptModal, setShowReceiptModal] = useState(false);
-  
+
   // Payment modal state
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [bookingForPayment, setBookingForPayment] = useState(null);
@@ -65,7 +66,7 @@ const MyBookings = () => {
   useEffect(() => {
     const handleUserInteraction = () => {
       setIsInteracting(true);
-      
+
       // Clear existing timer
       if (interactionTimerRef.current) {
         clearTimeout(interactionTimerRef.current);
@@ -90,7 +91,7 @@ const MyBookings = () => {
       window.removeEventListener('keypress', handleUserInteraction);
       window.removeEventListener('scroll', handleUserInteraction);
       window.removeEventListener('touchstart', handleUserInteraction);
-      
+
       if (interactionTimerRef.current) {
         clearTimeout(interactionTimerRef.current);
       }
@@ -109,13 +110,13 @@ const MyBookings = () => {
 
     try {
       const result = await bookingService.cancelBooking(bookingId);
-      
+
       if (result.refundProcessed) {
         alert(`✅ Booking cancelled successfully!\n\nRefund Amount: NPR ${result.refundAmount}\nRefund ID: ${result.refundId}`);
       } else {
         alert("✅ Booking cancelled successfully!");
       }
-      
+
       // Immediate refresh after action
       await fetchBookings();
     } catch (error) {
@@ -137,7 +138,7 @@ const MyBookings = () => {
       reservedUntil: booking.reservedUntil,
       status: booking.status
     };
-    
+
     setBookingForPayment(reservationData);
     setShowPaymentModal(true);
   };
@@ -180,8 +181,8 @@ const MyBookings = () => {
     await fetchBookings();
   };
 
-  const filteredBookings = filter === "ALL" 
-    ? bookings 
+  const filteredBookings = filter === "ALL"
+    ? bookings
     : bookings.filter(b => b.status === filter);
 
   const sortedBookings = bookingService.sortByStartTime(filteredBookings);
@@ -241,7 +242,7 @@ const MyBookings = () => {
           <div className="empty-icon">📅</div>
           <h3>No bookings found</h3>
           <p>
-            {filter === "ALL" 
+            {filter === "ALL"
               ? "Book a charger to see it here"
               : `No ${bookingService.getStatusDisplayText(filter).toLowerCase()} bookings`
             }
@@ -313,13 +314,13 @@ const BookingCard = ({ booking, onCancel, onPayNow, onViewReceipt, onRefresh }) 
   };
 
   return (
-    <div className={`booking-card ${needsPayment ? 'needs-payment' : ''} ${isExpired ? 'expired-card' : ''}`} 
-         style={{ borderLeftColor: statusColor }}>
-      
+    <div className={`booking-card ${needsPayment ? 'needs-payment' : ''} ${isExpired ? 'expired-card' : ''}`}
+      style={{ borderLeftColor: statusColor }}>
+
       {/* Timer for RESERVED/PAYMENT_PENDING bookings */}
       {needsPayment && booking.reservedUntil && !isExpired && (
         <div className="card-timer-section">
-          <PaymentTimer 
+          <PaymentTimer
             reservedUntil={booking.reservedUntil}
             onExpire={onRefresh}
             showWarning={true}
@@ -346,7 +347,7 @@ const BookingCard = ({ booking, onCancel, onPayNow, onViewReceipt, onRefresh }) 
           </h3>
           <span className="booking-id">Booking #{booking.bookingId}</span>
         </div>
-        <span 
+        <span
           className={`booking-status ${bookingService.getStatusBadgeClass(booking.status)}`}
           style={{ backgroundColor: statusColor }}
         >
@@ -362,7 +363,7 @@ const BookingCard = ({ booking, onCancel, onPayNow, onViewReceipt, onRefresh }) 
             <span className="detail-value">{formatDateTime(booking.startTime)}</span>
           </div>
         </div>
-        
+
         <div className="detail-row">
           <span className="detail-icon">🏁</span>
           <div className="detail-content">
@@ -419,11 +420,22 @@ const BookingCard = ({ booking, onCancel, onPayNow, onViewReceipt, onRefresh }) 
         </div>
       )}
 
+      {/* After existing action buttons */}
+      {booking.status === "COMPLETED" && (
+        <RatingButton
+          bookingId={booking.bookingId}
+          chargerId={booking.chargerId}
+          chargerName={booking.chargerName}
+          startTime={booking.startTime}
+          onRatingSubmit={() => fetchBookings()}
+        />
+      )}
+
       {/* Action Buttons */}
       <div className="booking-actions">
         {/* Payment Button */}
         {needsPayment && !isExpired && (
-          <button 
+          <button
             className="btn btn-primary pay-now-btn pulse-btn"
             onClick={() => onPayNow(booking)}
           >
@@ -434,7 +446,7 @@ const BookingCard = ({ booking, onCancel, onPayNow, onViewReceipt, onRefresh }) 
 
         {/* ⭐ NEW - Chat with Host Button */}
         {isConfirmed && booking.hostId && (
-          <ChatButton 
+          <ChatButton
             userId={booking.hostId}
             userName={booking.hostName || "Host"}
             userType="host"
@@ -445,7 +457,7 @@ const BookingCard = ({ booking, onCancel, onPayNow, onViewReceipt, onRefresh }) 
 
         {/* View Receipt Button */}
         {hasReceipt && (
-          <button 
+          <button
             className="btn btn-secondary"
             onClick={() => onViewReceipt(booking)}
           >
@@ -456,7 +468,7 @@ const BookingCard = ({ booking, onCancel, onPayNow, onViewReceipt, onRefresh }) 
 
         {/* Cancel Button */}
         {canCancel && (
-          <button 
+          <button
             className="btn btn-danger"
             onClick={() => onCancel(booking.bookingId, booking.status)}
           >

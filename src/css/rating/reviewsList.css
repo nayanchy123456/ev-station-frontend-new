@@ -1,0 +1,388 @@
+/* ===============================================
+   REVIEWS LIST COMPONENT STYLES
+   =============================================== */
+
+.reviews-list-container {
+  padding: 24px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin: 20px 0;
+  position: relative;
+}
+
+.reviews-header {
+  margin-bottom: 20px;
+}
+
+.reviews-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+/* ===============================================
+   REVIEWS GRID
+   =============================================== */
+
+.reviews-grid {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+/* ===============================================
+   REVIEW CARD
+   =============================================== */
+
+.review-card {
+  padding: 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background-color: #fafafa;
+  transition: all 0.2s ease;
+}
+
+.review-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.review-header {
+  margin-bottom: 12px;
+}
+
+.reviewer-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.reviewer-name-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.reviewer-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.reviewer-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.reviewer-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+  line-height: 1.2;
+}
+
+.review-date {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.review-comment {
+  font-size: 15px;
+  color: #374151;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+}
+
+.edited-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.edited-icon {
+  font-size: 14px;
+}
+
+.edited-text {
+  font-size: 12px;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* ===============================================
+   EMPTY STATE
+   =============================================== */
+
+.reviews-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6b7280;
+}
+
+.empty-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.reviews-empty h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 8px 0;
+}
+
+.reviews-empty p {
+  font-size: 14px;
+  margin: 0;
+  color: #6b7280;
+}
+
+/* ===============================================
+   LOADING STATE
+   =============================================== */
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  gap: 12px;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  z-index: 10;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-state p {
+  color: #6b7280;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* ===============================================
+   PAGINATION
+   =============================================== */
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.pagination-btn {
+  padding: 10px 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: white;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+  transform: translateY(-1px);
+}
+
+.pagination-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #f9fafb;
+}
+
+.page-indicator {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* ===============================================
+   RESPONSIVE DESIGN
+   =============================================== */
+
+@media (max-width: 768px) {
+  .reviews-list-container {
+    padding: 20px 16px;
+    margin: 16px 0;
+  }
+
+  .review-card {
+    padding: 16px;
+  }
+
+  .reviewer-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .reviewer-name-section {
+    width: 100%;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .pagination-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .reviews-title {
+    font-size: 18px;
+  }
+
+  .reviewer-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+
+  .reviewer-name {
+    font-size: 14px;
+  }
+
+  .review-comment {
+    font-size: 14px;
+  }
+}
+
+/* ===============================================
+   DARK MODE SUPPORT (OPTIONAL)
+   =============================================== */
+
+@media (prefers-color-scheme: dark) {
+  .reviews-list-container {
+    background-color: #1f2937;
+  }
+
+  .reviews-title {
+    color: #f9fafb;
+  }
+
+  .review-card {
+    background-color: #111827;
+    border-color: #374151;
+  }
+
+  .reviewer-name {
+    color: #f9fafb;
+  }
+
+  .review-date {
+    color: #9ca3af;
+  }
+
+  .review-comment {
+    color: #e5e7eb;
+  }
+
+  .edited-indicator {
+    border-top-color: #374151;
+  }
+
+  .edited-text {
+    color: #6b7280;
+  }
+
+  .reviews-empty h3 {
+    color: #e5e7eb;
+  }
+
+  .reviews-empty p {
+    color: #9ca3af;
+  }
+
+  .pagination {
+    border-top-color: #374151;
+  }
+
+  .pagination-btn {
+    background-color: #374151;
+    color: #e5e7eb;
+    border-color: #4b5563;
+  }
+
+  .pagination-btn:hover:not(:disabled) {
+    background-color: #4b5563;
+    border-color: #6b7280;
+  }
+
+  .pagination-btn:disabled {
+    background-color: #1f2937;
+  }
+
+  .page-indicator {
+    color: #9ca3af;
+  }
+
+  .loading-overlay {
+    background-color: rgba(31, 41, 55, 0.8);
+  }
+
+  .spinner {
+    border-color: #374151;
+    border-top-color: #3b82f6;
+  }
+}
