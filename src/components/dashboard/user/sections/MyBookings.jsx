@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import bookingService from "../../../../services/bookingService";
+import ChatButton from "../../../ChatButton"; // ⭐ NEW - Import ChatButton
 import PaymentModal from "./PaymentModal";
 import PaymentTimer from "./PaymentTimer";
 import ReceiptModal from "./ReceiptModal";
@@ -285,7 +286,7 @@ const MyBookings = () => {
   );
 };
 
-// BookingCard Component
+// ⭐ UPDATED BookingCard Component with Chat Integration
 const BookingCard = ({ booking, onCancel, onPayNow, onViewReceipt, onRefresh }) => {
   const statusColor = bookingService.getStatusColor(booking.status);
   const needsPayment = bookingService.needsPayment(booking.status);
@@ -294,6 +295,7 @@ const BookingCard = ({ booking, onCancel, onPayNow, onViewReceipt, onRefresh }) 
   const isExpired = booking.status === "EXPIRED";
   const isReserved = booking.status === "RESERVED";
   const isPaymentPending = booking.status === "PAYMENT_PENDING";
+  const isConfirmed = booking.status === "CONFIRMED"; // ⭐ NEW
 
   const formatDateTime = (dateString) => {
     return new Date(dateString).toLocaleString("en-US", {
@@ -396,6 +398,17 @@ const BookingCard = ({ booking, onCancel, onPayNow, onViewReceipt, onRefresh }) 
             </div>
           </div>
         )}
+
+        {/* ⭐ NEW - Host Information (if available) */}
+        {booking.hostName && (
+          <div className="detail-row">
+            <span className="detail-icon">👤</span>
+            <div className="detail-content">
+              <span className="detail-label">Host</span>
+              <span className="detail-value">{booking.hostName}</span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Warning for expired bookings */}
@@ -408,6 +421,7 @@ const BookingCard = ({ booking, onCancel, onPayNow, onViewReceipt, onRefresh }) 
 
       {/* Action Buttons */}
       <div className="booking-actions">
+        {/* Payment Button */}
         {needsPayment && !isExpired && (
           <button 
             className="btn btn-primary pay-now-btn pulse-btn"
@@ -418,6 +432,18 @@ const BookingCard = ({ booking, onCancel, onPayNow, onViewReceipt, onRefresh }) 
           </button>
         )}
 
+        {/* ⭐ NEW - Chat with Host Button */}
+        {isConfirmed && booking.hostId && (
+          <ChatButton 
+            userId={booking.hostId}
+            userName={booking.hostName || "Host"}
+            userType="host"
+            variant="outline"
+            size="small"
+          />
+        )}
+
+        {/* View Receipt Button */}
         {hasReceipt && (
           <button 
             className="btn btn-secondary"
@@ -428,6 +454,7 @@ const BookingCard = ({ booking, onCancel, onPayNow, onViewReceipt, onRefresh }) 
           </button>
         )}
 
+        {/* Cancel Button */}
         {canCancel && (
           <button 
             className="btn btn-danger"
@@ -438,6 +465,7 @@ const BookingCard = ({ booking, onCancel, onPayNow, onViewReceipt, onRefresh }) 
           </button>
         )}
 
+        {/* Active Charging Indicator */}
         {booking.status === "ACTIVE" && (
           <div className="active-notice">
             <span className="pulse-dot"></span>

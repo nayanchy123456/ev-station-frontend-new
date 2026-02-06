@@ -65,14 +65,26 @@ api.interceptors.response.use(
         if (newToken) {
           console.log("✅ Token refreshed:", newToken);
           localStorage.setItem("token", newToken);
+          
+          // ✅ FIX: Also update userId and role from the new token
+          try {
+            const payload = JSON.parse(atob(newToken.split('.')[1]));
+            localStorage.setItem('userId', payload.userId.toString());
+            localStorage.setItem('role', payload.role);
+          } catch (decodeError) {
+            console.error('Failed to decode refreshed token:', decodeError);
+          }
+          
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
           return api(originalRequest); // retry original request
         }
       } catch (refreshError) {
         console.error("❌ Token refresh failed", refreshError);
-        // Only redirect if truly unauthorized
+        // ✅ FIX: Clear all localStorage items including userId and role
         localStorage.removeItem("token");
         localStorage.removeItem("user");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("role");
         window.location.href = "/login";
       }
     }
