@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import "../../../../css/chargerList.css";
 import api from "../../../../services/api";
 import ChargerMap from "./ChargerMap";
+import StarRating from "../../../rating/StarRating.jsx";
+import ratingService from "../../../../services/ratingService.js";
 
 const BACKEND_URL = "http://localhost:8080";
 
@@ -15,6 +17,7 @@ const ChargerList = () => {
   const [selectedCharger, setSelectedCharger] = useState(null);
   const carouselRefs = useRef({});
   const [activeIndex, setActiveIndex] = useState({});
+  const [ratingSummaries, setRatingSummaries] = useState({});
 
   useEffect(() => {
     fetchChargers();
@@ -40,6 +43,9 @@ const ChargerList = () => {
       response.data.forEach(c => initialIndex[c.id] = 0);
       setActiveIndex(initialIndex);
 
+      // Fetch rating summaries for all chargers
+      fetchRatingSummaries(response.data);
+
       if (response.data.length === 0) setError("No chargers found matching your criteria.");
     } catch (err) {
       console.error("Error fetching chargers:", err);
@@ -48,6 +54,22 @@ const ChargerList = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchRatingSummaries = async (chargerList) => {
+    const summaries = {};
+    await Promise.all(
+      chargerList.map(async (charger) => {
+        try {
+          const summary = await ratingService.getChargerRatingSummary(charger.id);
+          summaries[charger.id] = summary;
+        } catch (error) {
+          console.error(`Failed to fetch rating for charger ${charger.id}:`, error);
+          summaries[charger.id] = { averageRating: 0, totalRatings: 0 };
+        }
+      })
+    );
+    setRatingSummaries(summaries);
   };
 
   const handleChange = e => setFilters({ ...filters, [e.target.name]: e.target.value });
@@ -135,41 +157,63 @@ const ChargerList = () => {
 
           {!loading && chargers.length > 0 ? (
             <div className="charger-grid">
-              {chargers.map(c => (
-                <div
-                  className={`charger-card ${selectedCharger?.id === c.id ? 'selected' : ''}`}
-                  key={c.id}
-                  onClick={() => handleChargerClick(c)}
-                >
-                  <div className="slider-container">
-                    <button className="arrow left" onClick={e => { e.stopPropagation(); scrollCarousel(c.id, "left"); }} disabled={activeIndex[c.id] === 0}>&lt;</button>
-                    <div className="carousel-wrapper" ref={el => (carouselRefs.current[c.id] = el)}>
-                      {c.images && c.images.length > 0 ? c.images.map((img, idx) => (
-                        <img key={idx} src={getImageUrl(img)} alt={`${c.name} - Image ${idx + 1}`} onError={e => e.target.src = "https://via.placeholder.com/160x120?text=Image+Not+Found"} />
-                      )) : <img src="https://via.placeholder.com/160x120?text=No+Image" alt="No charger images" />}
+              {chargers.map(c => {
+                const summary = ratingSummaries[c.id] || { averageRating: 0, totalRatings: 0 };
+                
+                return (
+                  <div
+                    className={`charger-card ${selectedCharger?.id === c.id ? 'selected' : ''}`}
+                    key={c.id}
+                    onClick={() => handleChargerClick(c)}
+                  >
+                    <div className="slider-container">
+                      <button className="arrow left" onClick={e => { e.stopPropagation(); scrollCarousel(c.id, "left"); }} disabled={activeIndex[c.id] === 0}>&lt;</button>
+                      <div className="carousel-wrapper" ref={el => (carouselRefs.current[c.id] = el)}>
+                        {c.images && c.images.length > 0 ? c.images.map((img, idx) => (
+                          <img key={idx} src={getImageUrl(img)} alt={`${c.name} - Image ${idx + 1}`} onError={e => e.target.src = "https://via.placeholder.com/160x120?text=Image+Not+Found"} />
+                        )) : <img src="https://via.placeholder.com/160x120?text=No+Image" alt="No charger images" />}
+                      </div>
+                      <button className="arrow right" onClick={e => { e.stopPropagation(); scrollCarousel(c.id, "right"); }} disabled={activeIndex[c.id] === (c.images?.length || 1) - 1}>&gt;</button>
                     </div>
-                    <button className="arrow right" onClick={e => { e.stopPropagation(); scrollCarousel(c.id, "right"); }} disabled={activeIndex[c.id] === (c.images?.length || 1) - 1}>&gt;</button>
-                  </div>
 
-                  {c.images && c.images.length > 1 && (
-                    <div className="carousel-dots">
-                      {c.images.map((_, idx) => (
-                        <span key={idx} className={activeIndex[c.id] === idx ? "dot active" : "dot"} onClick={e => { e.stopPropagation(); handleDotClick(c.id, idx); }}></span>
-                      ))}
+                    {c.images && c.images.length > 1 && (
+                      <div className="carousel-dots">
+                        {c.images.map((_, idx) => (
+                          <span key={idx} className={activeIndex[c.id] === idx ? "dot active" : "dot"} onClick={e => { e.stopPropagation(); handleDotClick(c.id, idx); }}></span>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="charger-info">
+                      <h3>{c.name}</h3>
+                      <p><strong>Brand:</strong> {c.brand}</p>
+                      <p><strong>Location:</strong> {c.location}</p>
+                      <p><strong>Price:</strong> Rs {c.pricePerKwh}/kWh</p>
+                      <p><strong>Host:</strong> {c.hostEmail || "N/A"}</p>
+                      
+                      {/* Rating Display with Stars */}
+                      <div className="charger-rating-display">
+                        <strong>Rating:</strong>
+                        <div className="rating-stars-container">
+                          <StarRating value={summary.averageRating} size="small" readOnly={true} />
+                          <span className="rating-text">
+                            {summary.averageRating > 0 ? (
+                              <>
+                                <strong>{summary.averageRating.toFixed(1)}</strong>
+                                <span className="rating-count">({summary.totalRatings} {summary.totalRatings === 1 ? 'review' : 'reviews'})</span>
+                              </>
+                            ) : (
+                              <span className="no-ratings">No ratings yet</span>
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <button className="view-details-btn" onClick={e => handleViewDetails(c.id, e)}>View Details</button>
                     </div>
-                  )}
-
-                  <div className="charger-info">
-                    <h3>{c.name}</h3>
-                    <p><strong>Brand:</strong> {c.brand}</p>
-                    <p><strong>Location:</strong> {c.location}</p>
-                    <p><strong>Price:</strong> Rs {c.pricePerKwh}/kWh</p>
-                    <p><strong>Host:</strong> {c.hostEmail || "N/A"}</p>
-                    <p><strong>Rating:</strong> ⭐ {c.rating?.toFixed(1) || "0.0"}</p>
-                    <button className="view-details-btn" onClick={e => handleViewDetails(c.id, e)}>View Details</button>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             !loading && (
@@ -186,8 +230,8 @@ const ChargerList = () => {
             chargers={chargers}
             selectedCharger={selectedCharger}
             onMarkerClick={handleChargerClick}
-            removeOverlay={true} // Pass prop to remove dark overlay
-            showIndicator={true} // Highlight selected charger properly
+            removeOverlay={true}
+            showIndicator={true}
           />
         </div>
       </div>

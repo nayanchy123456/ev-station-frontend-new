@@ -1,0 +1,211 @@
+/* ===============================================
+   RATING BUTTON STYLES
+   =============================================== */
+
+.rating-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ===============================================
+   UNRATED STATE (Call to Action)
+   =============================================== */
+
+.rating-button.unrated {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(251, 191, 36, 0.3),
+              0 2px 4px -1px rgba(251, 191, 36, 0.2);
+}
+
+.rating-button.unrated:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(251, 191, 36, 0.4),
+              0 4px 6px -2px rgba(251, 191, 36, 0.3);
+}
+
+.rating-button.unrated:active {
+  transform: translateY(0);
+}
+
+/* Pulse animation to draw attention */
+.rating-button.unrated::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%) scale(0);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 0;
+  }
+}
+
+/* ===============================================
+   RATED STATE (Completed)
+   =============================================== */
+
+.rating-button.rated {
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 2px solid #e5e7eb;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 10px 16px;
+  gap: 4px;
+}
+
+.rating-button.rated:hover {
+  background-color: #e5e7eb;
+  border-color: #d1d5db;
+  transform: translateY(-1px);
+}
+
+.rating-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rating-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #10b981;
+}
+
+.edit-hint {
+  font-size: 12px;
+  font-weight: 400;
+  color: #9ca3af;
+  margin-top: 2px;
+}
+
+.rating-button.rated:hover .edit-hint {
+  color: #6b7280;
+}
+
+/* ===============================================
+   LOADING STATE
+   =============================================== */
+
+.rating-button.loading {
+  background-color: #f9fafb;
+  color: #9ca3af;
+  border: 1px solid #e5e7eb;
+  cursor: not-allowed;
+}
+
+.btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #e5e7eb;
+  border-top-color: #9ca3af;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===============================================
+   BUTTON ELEMENTS
+   =============================================== */
+
+.btn-icon {
+  font-size: 18px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.btn-text {
+  font-size: 15px;
+}
+
+/* ===============================================
+   RESPONSIVE DESIGN
+   =============================================== */
+
+@media (max-width: 768px) {
+  .rating-button {
+    width: 100%;
+    justify-content: center;
+    padding: 14px 20px;
+  }
+
+  .rating-button.rated {
+    align-items: center;
+  }
+
+  .edit-hint {
+    display: none;
+  }
+}
+
+/* ===============================================
+   ACCESSIBILITY
+   =============================================== */
+
+.rating-button:focus {
+  outline: 3px solid rgba(59, 130, 246, 0.5);
+  outline-offset: 2px;
+}
+
+.rating-button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ===============================================
+   DARK MODE SUPPORT (OPTIONAL)
+   =============================================== */
+
+@media (prefers-color-scheme: dark) {
+  .rating-button.rated {
+    background-color: #374151;
+    color: #e5e7eb;
+    border-color: #4b5563;
+  }
+
+  .rating-button.rated:hover {
+    background-color: #4b5563;
+    border-color: #6b7280;
+  }
+
+  .edit-hint {
+    color: #6b7280;
+  }
+
+  .rating-button.rated:hover .edit-hint {
+    color: #9ca3af;
+  }
+
+  .rating-button.loading {
+    background-color: #1f2937;
+    color: #6b7280;
+    border-color: #374151;
+  }
+}
