@@ -4,6 +4,7 @@ import App from "./App";
 import "./css/login.css";
 import "./css/register.css";
 import "leaflet/dist/leaflet.css";
+import './css/backdrop-filter-fix.css'
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(<App />);

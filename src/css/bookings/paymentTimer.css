@@ -1,7 +1,7 @@
 /* src/css/bookings/paymentTimer.css - Dark Theme */
 
 .payment-timer {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.15) 100%);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.25) 100%);
   border: 2px solid rgba(59, 130, 246, 0.4);
   border-radius: 16px;
   padding: 20px;
@@ -12,7 +12,7 @@
   overflow: hidden;
   animation: timerSlideIn 0.4s ease;
   margin-bottom: 20px;
-  backdrop-filter: blur(10px);
+  /* backdrop-filter removed - was causing blur */
 }
 
 @keyframes timerSlideIn {

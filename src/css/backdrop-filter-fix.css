@@ -1,0 +1,89 @@
+/* ============================================
+   COMPLETE MODAL FIX - Covers ALL Modals
+   - Receipt Modal
+   - Payment Modal  
+   - Book Charger Modal
+   - All other modals
+   ============================================ */
+
+/* Remove backdrop-filter from ALL modals */
+.receipt-modal,
+.receipt-modal *,
+.payment-modal,
+.payment-modal *,
+.book-charger-modal,
+.book-charger-modal *,
+.modal,
+.modal *,
+[class*="modal"],
+[class*="modal"] * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Ensure modal overlays are visible but not blurred */
+.receipt-modal {
+  background: rgba(10, 25, 41, 0.85) !important;
+}
+
+.payment-modal {
+  background: transparent !important;
+}
+
+.payment-modal .modal-overlay {
+  background: rgba(0, 0, 0, 0.85) !important;
+}
+
+.book-charger-modal .modal-overlay {
+  background: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Ensure all modal content is interactive and scrollable */
+.receipt-modal-content,
+.payment-modal-content,
+.modal-content,
+.receipt-container {
+  pointer-events: auto !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+/* Ensure all buttons and interactive elements work */
+.method-card,
+.time-slot,
+button,
+a,
+input,
+select,
+textarea,
+[role="button"],
+[type="button"],
+[type="submit"] {
+  pointer-events: auto !important;
+}
+
+/* Keep disabled elements disabled */
+:disabled,
+.disabled,
+[disabled] {
+  pointer-events: none !important;
+}
+
+/* Fix z-index stacking for modals */
+.modal-overlay {
+  z-index: 1 !important;
+}
+
+.receipt-modal-content,
+.payment-modal-content,
+.modal-content {
+  z-index: 10 !important;
+  position: relative !important;
+}
+
+/* Ensure scrollbars work */
+*::-webkit-scrollbar {
+  pointer-events: auto !important;
+}
+
+/* Import this file LAST in your main.jsx */
