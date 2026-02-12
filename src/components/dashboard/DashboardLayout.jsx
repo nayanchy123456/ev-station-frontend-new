@@ -39,7 +39,26 @@ import AllChargers from "./admin/sections/AllChargers";
 import AdminReports from "./admin/sections/AdminReports";
 import AdminMessages from "./admin/sections/AdminMessages";
 
+// Admin Analytics — full dashboard (contains its own tab navigation)
+import AdminAnalyticsDashboard from "../analytics/admin/AdminAnalyticsDashboard";
+
 import "../../css/dashboardLayout.css";
+
+/**
+ * Maps sidebar analytics-* keys to AdminAnalyticsDashboard tab ids.
+ * "analytics-overview" → "overview", "analytics-users" → "users", etc.
+ */
+const ANALYTICS_TAB_MAP = {
+  "analytics-overview": "overview",
+  "analytics-users": "users",
+  "analytics-hosts": "hosts",
+  "analytics-chargers": "chargers",
+  "analytics-bookings": "bookings",
+  "analytics-revenue": "revenue",
+  "analytics-ratings": "ratings",
+  "analytics-platform": "platform",
+  "analytics-time": "time",
+};
 
 const DashboardLayout = ({ role }) => {
   const [activeSection, setActiveSection] = useState("dashboard");
@@ -47,6 +66,8 @@ const DashboardLayout = ({ role }) => {
   const [searchFilters, setSearchFilters] = useState({});
   const [selectedChargerId, setSelectedChargerId] = useState(null);
   const [chatInitData, setChatInitData] = useState(null);
+
+
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -63,41 +84,42 @@ const DashboardLayout = ({ role }) => {
 
   const handleSearch = (filters) => setSearchFilters(filters);
 
-  // Handle navigation to chat from other components
+  // Navigate to chat/messages via router state
   useEffect(() => {
-    if (location.state?.navigateTo === 'chat' || location.state?.navigateTo === 'messages') {
-      console.log('🚀 Navigating to chat with data:', location.state);
-      
+    if (
+      location.state?.navigateTo === "chat" ||
+      location.state?.navigateTo === "messages"
+    ) {
       setChatInitData({
         hostId: location.state.hostId,
         hostEmail: location.state.hostEmail,
         chargerId: location.state.chargerId,
-        chargerName: location.state.chargerName
+        chargerName: location.state.chargerName,
       });
-      
-      setActiveSection('messages');
+      setActiveSection("messages");
       navigate(location.pathname, { replace: true, state: {} });
     }
   }, [location.state, navigate]);
 
-  // Listen for custom events
+  // Listen for custom events dispatched by child components
   useEffect(() => {
     const handleSetActiveSection = (event) => {
-      console.log('📡 Received setActiveSection event:', event.detail);
       setActiveSection(event.detail);
     };
-
     window.addEventListener("setActiveSection", handleSetActiveSection);
-    
-    return () => {
+    return () =>
       window.removeEventListener("setActiveSection", handleSetActiveSection);
-    };
   }, []);
 
+
+
+  // ── Section renderer ─────────────────────────────────────────────────────
   const renderSection = () => {
+    // ── USER ────────────────────────────────────────────────────────────────
     if (role === "USER") {
       switch (activeSection) {
         case "dashboard":
+          return <UserAnalyticsDashboard />;
         case "profile":
           return <UserProfile />;
         case "payments":
@@ -110,27 +132,26 @@ const DashboardLayout = ({ role }) => {
           return <MyBookings setActiveSection={setActiveSection} />;
         case "messages":
           return <UserMessages chatInitData={chatInitData} />;
-        
-        // User Analytics
         case "analytics-overview":
-          return <UserAnalyticsDashboard />;
+          return <UserAnalyticsDashboard externalTab="overview" />;
         case "analytics-spending":
-          return <UserSpendingAnalytics />;
+          return <UserAnalyticsDashboard externalTab="spending" />;
         case "analytics-charging":
-          return <UserChargingBehavior />;
+          return <UserAnalyticsDashboard externalTab="charging" />;
         case "analytics-bookings":
-          return <UserBookingAnalytics />;
+          return <UserAnalyticsDashboard externalTab="bookings" />;
         case "analytics-ratings":
-          return <UserRatingAnalytics />;
-        
+          return <UserAnalyticsDashboard externalTab="ratings" />;
         default:
           return <UserProfile />;
       }
     }
 
+    // ── HOST ────────────────────────────────────────────────────────────────
     if (role === "HOST") {
       switch (activeSection) {
         case "dashboard":
+          return <HostAnalyticsDashboard />;
         case "myChargers":
           return (
             <HostChargers
@@ -151,19 +172,16 @@ const DashboardLayout = ({ role }) => {
           return <UserSupport />;
         case "messages":
           return <HostMessages chatInitData={chatInitData} />;
-        
-        // Host Analytics
         case "analytics-overview":
-          return <HostAnalyticsDashboard />;
+          return <HostAnalyticsDashboard externalTab="overview" />;
         case "analytics-revenue":
-          return <HostRevenueAnalytics />;
+          return <HostAnalyticsDashboard externalTab="revenue" />;
         case "analytics-chargers":
-          return <HostChargerAnalytics />;
+          return <HostAnalyticsDashboard externalTab="chargers" />;
         case "analytics-bookings":
-          return <HostBookingAnalytics />;
+          return <HostAnalyticsDashboard externalTab="bookings" />;
         case "analytics-users":
-          return <HostUserAnalytics />;
-        
+          return <HostAnalyticsDashboard externalTab="users" />;
         default:
           return (
             <HostChargers
@@ -175,9 +193,18 @@ const DashboardLayout = ({ role }) => {
       }
     }
 
+    // ── ADMIN ───────────────────────────────────────────────────────────────
     if (role === "ADMIN") {
+      // All analytics-* sections render via AdminAnalyticsDashboard with an externalTab
+      if (activeSection.startsWith("analytics-")) {
+        const tab = ANALYTICS_TAB_MAP[activeSection] || "overview";
+        return <AdminAnalyticsDashboard externalTab={tab} />;
+      }
+
       switch (activeSection) {
         case "dashboard":
+          // Dashboard shows the full analytics dashboard (its own tabs)
+          return <AdminAnalyticsDashboard />;
         case "users":
           return <UsersManagement />;
         case "hosts":
@@ -196,7 +223,6 @@ const DashboardLayout = ({ role }) => {
     }
   };
 
-  // Show nested routes when URL contains them
   const isNestedRoute =
     location.pathname.includes("edit-charger") ||
     location.pathname.includes("charger/");
