@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import "../../css/sidebar.css";
-import { 
-  FaUser, 
-  FaMoneyBillAlt, 
-  FaLifeRing, 
-  FaSignOutAlt, 
-  FaChargingStation, 
-  FaPlus, 
-  FaClipboardList, 
-  FaUsers, 
+import {
+  FaUser,
+  FaMoneyBillAlt,
+  FaLifeRing,
+  FaSignOutAlt,
+  FaChargingStation,
+  FaPlus,
+  FaClipboardList,
+  FaUsers,
   FaChartBar,
   FaHome,
   FaCog,
@@ -21,95 +21,137 @@ import {
   FaDollarSign,
   FaBolt,
   FaCalendar,
-  FaUserFriends
+  FaUserFriends,
+  FaBuilding,
+  FaClock,
+  FaTachometerAlt,
 } from "react-icons/fa";
-import { FiMessageSquare } from "react-icons/fi";
+import { FiMessageSquare, FiActivity, FiTrendingUp } from "react-icons/fi";
+import { MdOutlineBarChart } from "react-icons/md";
 
-const Sidebar = ({ role, setActiveSection, activeSection, handleLogout, collapsed, toggleSidebar }) => {
+const Sidebar = ({
+  role,
+  setActiveSection,
+  activeSection,
+  handleLogout,
+  collapsed,
+  toggleSidebar,
+}) => {
   const [analyticsExpanded, setAnalyticsExpanded] = useState(false);
 
   // Auto-expand analytics if on analytics page
   useEffect(() => {
-    if (activeSection.startsWith('analytics-')) {
+    if (activeSection.startsWith("analytics-")) {
       setAnalyticsExpanded(true);
     }
   }, [activeSection]);
 
-  // Debug: Log when analytics expanded state changes
-  useEffect(() => {
-    console.log('📊 Analytics Expanded:', analyticsExpanded);
-  }, [analyticsExpanded]);
+  // ── Submenus ──────────────────────────────────────────────────────────────
 
-  // User Analytics Submenu
   const userAnalyticsSubmenu = [
     { key: "analytics-overview", icon: <FaChartBar />, label: "Overview" },
     { key: "analytics-spending", icon: <FaDollarSign />, label: "Spending" },
     { key: "analytics-charging", icon: <FaBolt />, label: "Charging Behavior" },
     { key: "analytics-bookings", icon: <FaCalendar />, label: "Bookings" },
-    { key: "analytics-ratings", icon: <FaStar />, label: "Ratings" }
+    { key: "analytics-ratings", icon: <FaStar />, label: "Ratings" },
   ];
 
-  // Host Analytics Submenu
   const hostAnalyticsSubmenu = [
     { key: "analytics-overview", icon: <FaChartBar />, label: "Overview" },
     { key: "analytics-revenue", icon: <FaDollarSign />, label: "Revenue" },
-    { key: "analytics-chargers", icon: <FaChargingStation />, label: "Chargers" },
+    {
+      key: "analytics-chargers",
+      icon: <FaChargingStation />,
+      label: "Chargers",
+    },
     { key: "analytics-bookings", icon: <FaCalendar />, label: "Bookings" },
-    { key: "analytics-users", icon: <FaUserFriends />, label: "Users" }
+    { key: "analytics-users", icon: <FaUserFriends />, label: "Users" },
   ];
 
-  // User Menu with Analytics
+  /**
+   * Admin analytics sub-menu mirrors the 9 tabs inside AdminAnalyticsDashboard.
+   * Each key starts with "analytics-" so the parent stays highlighted.
+   */
+  const adminAnalyticsSubmenu = [
+    { key: "analytics-overview", icon: <FiActivity />, label: "Overview" },
+    { key: "analytics-users", icon: <FaUsers />, label: "Users" },
+    { key: "analytics-hosts", icon: <FaBuilding />, label: "Hosts" },
+    {
+      key: "analytics-chargers",
+      icon: <FaChargingStation />,
+      label: "Chargers",
+    },
+    { key: "analytics-bookings", icon: <FaCalendar />, label: "Bookings" },
+    { key: "analytics-revenue", icon: <FiTrendingUp />, label: "Revenue" },
+    { key: "analytics-ratings", icon: <FaStar />, label: "Ratings" },
+    {
+      key: "analytics-platform",
+      icon: <MdOutlineBarChart />,
+      label: "Platform",
+    },
+    { key: "analytics-time", icon: <FaClock />, label: "Time Analytics" },
+  ];
+
+  // ── Menus ─────────────────────────────────────────────────────────────────
+
   const userMenu = [
     { key: "dashboard", icon: <FaHome />, label: "Dashboard" },
     { key: "profile", icon: <FaUser />, label: "Profile" },
-    { key: "chargers", icon: <FaChargingStation />, label: "Find Chargers" },
+    {
+      key: "chargers",
+      icon: <FaChargingStation />,
+      label: "Find Chargers",
+    },
     { key: "bookings", icon: <FaCalendarCheck />, label: "My Bookings" },
     { key: "messages", icon: <FiMessageSquare />, label: "Messages" },
-    { 
-      key: "analytics", 
-      icon: <FaChartBar />, 
+    {
+      key: "analytics",
+      icon: <FaChartBar />,
       label: "Analytics",
       hasSubmenu: true,
-      submenu: userAnalyticsSubmenu
+      submenu: userAnalyticsSubmenu,
     },
-    { key: "payments", icon: <FaMoneyBillAlt />, label: "Payments" },
-    { key: "support", icon: <FaLifeRing />, label: "Support" },
-    { key: "settings", icon: <FaCog />, label: "Settings" }
+    { key: "settings", icon: <FaCog />, label: "Settings" },
   ];
 
-  // Host Menu with Analytics
   const hostMenu = [
     { key: "dashboard", icon: <FaHome />, label: "Dashboard" },
-    { key: "myChargers", icon: <FaChargingStation />, label: "My Chargers" },
+    {
+      key: "myChargers",
+      icon: <FaChargingStation />,
+      label: "My Chargers",
+    },
     { key: "addCharger", icon: <FaPlus />, label: "Add Charger" },
     { key: "bookings", icon: <FaClipboardList />, label: "Bookings" },
     { key: "messages", icon: <FiMessageSquare />, label: "Messages" },
-    { 
-      key: "analytics", 
-      icon: <FaChartBar />, 
+    {
+      key: "analytics",
+      icon: <FaChartBar />,
       label: "Analytics",
       hasSubmenu: true,
-      submenu: hostAnalyticsSubmenu
+      submenu: hostAnalyticsSubmenu,
     },
-    { key: "payments", icon: <FaMoneyBillAlt />, label: "Payments" },
-    { key: "support", icon: <FaLifeRing />, label: "Support" },
-    { key: "settings", icon: <FaCog />, label: "Settings" }
+    { key: "settings", icon: <FaCog />, label: "Settings" },
   ];
 
-  // Admin Menu (no analytics submenu for admin)
   const adminMenu = [
-    { key: "dashboard", icon: <FaHome />, label: "Dashboard" },
-    { key: "users", icon: <FaUsers />, label: "Users Management" },
-    { key: "hosts", icon: <FaUsers />, label: "Hosts Management" },
-    { key: "chargers", icon: <FaChargingStation />, label: "All Chargers" },
+    { key: "dashboard", icon: <FaTachometerAlt />, label: "Dashboard" },
+    { key: "hosts", icon: <FaBuilding />, label: "Hosts Management" },
     { key: "messages", icon: <FiMessageSquare />, label: "Messages" },
-    { key: "reports", icon: <FaChartBar />, label: "Reports" },
-    { key: "support", icon: <FaLifeRing />, label: "Support" },
-    { key: "settings", icon: <FaCog />, label: "Settings" }
+    {
+      key: "analytics",
+      icon: <FaChartBar />,
+      label: "Analytics",
+      hasSubmenu: true,
+      submenu: adminAnalyticsSubmenu,
+    },
+    { key: "settings", icon: <FaCog />, label: "Settings" },
   ];
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
 
   const getMenu = () => {
-    switch(role) {
+    switch (role) {
       case "USER":
         return userMenu;
       case "HOST":
@@ -121,10 +163,8 @@ const Sidebar = ({ role, setActiveSection, activeSection, handleLogout, collapse
     }
   };
 
-  const menu = getMenu();
-
   const getRoleDisplay = () => {
-    switch(role) {
+    switch (role) {
       case "USER":
         return "User";
       case "HOST":
@@ -136,40 +176,28 @@ const Sidebar = ({ role, setActiveSection, activeSection, handleLogout, collapse
     }
   };
 
+  const isAnalyticsActive = () => activeSection.startsWith("analytics-");
+
   const handleMenuClick = (item) => {
-    console.log('🖱️ Menu clicked:', item.label, 'Has submenu:', item.hasSubmenu);
-    
     if (item.hasSubmenu) {
       const newState = !analyticsExpanded;
-      console.log('🔄 Toggling analytics submenu to:', newState);
       setAnalyticsExpanded(newState);
-      
-      // Set default analytics overview when opening analytics for the first time
-      if (newState && !activeSection.startsWith('analytics-')) {
-        setActiveSection('analytics-overview');
+      if (newState && !activeSection.startsWith("analytics-")) {
+        setActiveSection("analytics-overview");
       }
     } else {
-      console.log('➡️ Setting active section to:', item.key);
       setActiveSection(item.key);
-      // Close analytics dropdown when clicking other menu items
       setAnalyticsExpanded(false);
     }
   };
 
-  const isAnalyticsActive = () => {
-    return activeSection.startsWith('analytics-');
-  };
+  const menu = getMenu();
 
-  // Debug: Log current state
-  useEffect(() => {
-    console.log('🎯 Current active section:', activeSection);
-    console.log('📱 Sidebar collapsed:', collapsed);
-    console.log('👤 Role:', role);
-  }, [activeSection, collapsed, role]);
+  // ── Render ────────────────────────────────────────────────────────────────
 
   return (
     <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>
-      {/* Sidebar Header with Toggle */}
+      {/* Header */}
       <div className="sidebar-header">
         <h2 className="dashboard-title">
           {collapsed ? "EV" : `${getRoleDisplay()} Dashboard`}
@@ -181,17 +209,20 @@ const Sidebar = ({ role, setActiveSection, activeSection, handleLogout, collapse
 
       {/* Role Badge */}
       {!collapsed && (
-        <div className="sidebar-role-badge">
-          {getRoleDisplay()}
-        </div>
+        <div className="sidebar-role-badge">{getRoleDisplay()}</div>
       )}
 
       {/* Main Menu */}
       <ul className="sidebar-menu">
         {menu.map((item, index) => (
           <React.Fragment key={item.key}>
-            <li 
-              className={`${activeSection === item.key || (item.hasSubmenu && isAnalyticsActive()) ? "active" : ""} ${item.hasSubmenu ? "has-submenu" : ""}`}
+            <li
+              className={`${
+                activeSection === item.key ||
+                (item.hasSubmenu && isAnalyticsActive())
+                  ? "active"
+                  : ""
+              } ${item.hasSubmenu ? "has-submenu" : ""}`}
               onClick={() => handleMenuClick(item)}
               data-tooltip={item.label}
               style={{ animationDelay: `${index * 0.05}s` }}
@@ -205,19 +236,24 @@ const Sidebar = ({ role, setActiveSection, activeSection, handleLogout, collapse
               )}
             </li>
 
-            {/* Submenu for Analytics - FIXED: Always render but control visibility with CSS */}
+            {/* Submenu */}
             {item.hasSubmenu && (
-              <ul className={`sidebar-submenu ${analyticsExpanded && !collapsed ? 'show' : ''}`}>
+              <ul
+                className={`sidebar-submenu ${
+                  analyticsExpanded && !collapsed ? "show" : ""
+                }`}
+              >
                 {item.submenu.map((subItem, subIndex) => (
                   <li
                     key={subItem.key}
                     className={activeSection === subItem.key ? "active" : ""}
                     onClick={(e) => {
                       e.stopPropagation();
-                      console.log('📌 Submenu item clicked:', subItem.label);
                       setActiveSection(subItem.key);
                     }}
-                    style={{ animationDelay: `${(index + subIndex + 1) * 0.05}s` }}
+                    style={{
+                      animationDelay: `${(index + subIndex + 1) * 0.05}s`,
+                    }}
                   >
                     {subItem.icon}
                     <span className="text">{subItem.label}</span>
@@ -228,8 +264,8 @@ const Sidebar = ({ role, setActiveSection, activeSection, handleLogout, collapse
           </React.Fragment>
         ))}
 
-        {/* Logout Button */}
-        <li 
+        {/* Logout */}
+        <li
           onClick={handleLogout}
           data-tooltip="Logout"
           className="logout-item"
@@ -239,7 +275,7 @@ const Sidebar = ({ role, setActiveSection, activeSection, handleLogout, collapse
         </li>
       </ul>
 
-      {/* Sidebar Footer */}
+      {/* Footer */}
       {!collapsed && (
         <div className="sidebar-footer">
           <div className="footer-item">

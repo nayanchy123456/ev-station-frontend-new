@@ -130,17 +130,21 @@ body {
   flex: 1;
   margin-left: var(--sidebar-width);
   padding-top: var(--navbar-height);
-  transition: margin-left var(--transition-medium);
+  transition: margin-left var(--transition-medium), width var(--transition-medium);
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   position: relative;
   z-index: 1;
   background: transparent;
+  width: calc(100vw - var(--sidebar-width));
+  max-width: calc(100vw - var(--sidebar-width));
 }
 
 .dashboard-main.sidebar-collapsed {
   margin-left: var(--sidebar-collapsed);
+  width: calc(100vw - var(--sidebar-collapsed));
+  max-width: calc(100vw - var(--sidebar-collapsed));
 }
 
 /* ============================================
@@ -164,7 +168,11 @@ body {
   position: relative;
   animation: contentSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   min-height: calc(100vh - var(--navbar-height) - 48px);
+  max-height: calc(100vh - var(--navbar-height) - 48px);
   color: #e2e8f0;
+  width: calc(100% - 48px);
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 @keyframes contentSlideIn {

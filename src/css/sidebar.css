@@ -694,3 +694,53 @@
     overflow: visible !important;
   }
 }
+/* ============================================
+   ADMIN ANALYTICS SUBMENU ENHANCEMENTS
+   ============================================ */
+
+/* Make admin analytics submenu items slightly more compact
+   since there are 9 items */
+.sidebar-submenu li {
+  padding: 9px 16px 9px 44px;
+  min-height: 36px;
+}
+
+/* Active analytics item gets a purple-blue gradient accent */
+.sidebar-submenu li.active {
+  background: linear-gradient(90deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border-left-color: #667eea;
+  color: #c7d2fe;
+}
+
+/* Icon color in active submenu item */
+.sidebar-submenu li.active svg {
+  color: #a8b3ff;
+}
+
+/* Hover state */
+.sidebar-submenu li:hover {
+  background: rgba(30, 41, 59, 0.8);
+  border-left-color: #667eea;
+  transform: translateX(3px);
+  color: #e2e8f0;
+}
+
+/* Analytics parent item when expanded — keep it highlighted */
+.sidebar-menu li.has-submenu.active {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.25) 0%, rgba(118, 75, 162, 0.2) 100%);
+  border-left: 3px solid #667eea;
+  color: #c7d2fe;
+}
+
+/* Chevron icon alignment */
+.submenu-arrow {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  color: rgba(255,255,255,0.5);
+  transition: transform 0.25s ease, color 0.25s ease;
+}
+
+.sidebar-menu li.active .submenu-arrow {
+  color: #a8b3ff;
+}
