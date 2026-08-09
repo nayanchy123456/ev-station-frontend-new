@@ -15,6 +15,8 @@ import {
 } from "chart.js";
 import "../../../css/host-analytics.css";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -42,7 +44,7 @@ const HostRevenueAnalytics = () => {
       setError(null);
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        `http://localhost:8080/api/analytics/host/revenue?period=${period}`,
+        `${API_URL}/analytics/host/revenue?period=${period}`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }

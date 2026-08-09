@@ -1,11 +1,13 @@
 import axios from "axios";
 
-// ✅ Axios instance with correct base URL
+// ✅ Axios instance with correct base URL (from .env / .env.production)
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
+
 const api = axios.create({
-  baseURL: "http://localhost:8080/api", // only /api, NOT /api/auth
+  baseURL: API_BASE_URL, // only /api, NOT /api/auth
 });
 
-// ✅ Attach JWT token to every request + log it
+// ✅ Attach JWT token to every request
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -14,9 +16,7 @@ api.interceptors.request.use(
       console.log(
         "✅ Outgoing request:",
         config.method.toUpperCase(),
-        config.url,
-        "Token:",
-        token
+        config.url
       );
     } else {
       console.log(
@@ -51,7 +51,7 @@ api.interceptors.response.use(
       try {
         console.log("🔄 Attempting token refresh...");
         const refreshRes = await axios.post(
-          "http://localhost:8080/api/auth/refresh",
+          `${API_BASE_URL}/auth/refresh`,
           null,
           {
             headers: {
@@ -63,7 +63,7 @@ api.interceptors.response.use(
         const newToken = refreshRes.data.token;
 
         if (newToken) {
-          console.log("✅ Token refreshed:", newToken);
+          console.log("✅ Token refreshed");
           localStorage.setItem("token", newToken);
           
           // ✅ FIX: Also update userId and role from the new token

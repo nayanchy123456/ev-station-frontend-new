@@ -13,6 +13,8 @@ import {
 import "../../../css/analytics.css";
 import { FaStar, FaSpinner } from "react-icons/fa";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -36,7 +38,7 @@ const UserRatingAnalytics = () => {
       setLoading(true);
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        `http://localhost:8080/api/analytics/user/ratings`,
+        `${API_URL}/analytics/user/ratings`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
