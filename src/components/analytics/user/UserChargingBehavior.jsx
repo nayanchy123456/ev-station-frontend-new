@@ -14,6 +14,8 @@ import {
 import "../../../css/analytics.css";
 import { FaBolt, FaSpinner, FaClock, FaChargingStation, FaMapMarkerAlt } from "react-icons/fa";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -39,7 +41,7 @@ const UserChargingBehavior = () => {
       setLoading(true);
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        `http://localhost:8080/api/analytics/user/charging-behavior?period=${period}`,
+        `${API_URL}/analytics/user/charging-behavior?period=${period}`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }

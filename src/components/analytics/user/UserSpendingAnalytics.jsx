@@ -4,6 +4,8 @@ import '../../../css/analytics.css';
 import { FaDollarSign, FaSpinner, FaCalendar, FaChartLine } from 'react-icons/fa';
 import { SpendingAreaChart, PieChartComponent } from '../ChartComponents';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+
 const UserSpendingAnalytics = () => {
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState('LAST_7_DAYS');
@@ -19,7 +21,7 @@ const UserSpendingAnalytics = () => {
       setLoading(true);
       const token = localStorage.getItem('token');
       const response = await axios.get(
-        `http://localhost:8080/api/analytics/user/spending?period=${period}`,
+        `${API_URL}/analytics/user/spending?period=${period}`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }

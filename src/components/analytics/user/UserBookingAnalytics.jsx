@@ -15,6 +15,8 @@ import {
 import "../../../css/analytics.css";
 import { FaCalendar, FaSpinner, FaCheckCircle, FaTimesCircle, FaClock } from "react-icons/fa";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -41,7 +43,7 @@ const UserBookingAnalytics = () => {
       setLoading(true);
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        `http://localhost:8080/api/analytics/user/bookings?period=${period}`,
+        `${API_URL}/analytics/user/bookings?period=${period}`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }

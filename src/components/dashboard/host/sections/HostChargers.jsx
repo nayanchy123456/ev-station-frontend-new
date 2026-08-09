@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../../../../services/api";
 import "../../../../css/hostChargers.css";
 
-const BACKEND_URL = "http://localhost:8080"; // Backend URL
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8080"; // Backend URL
 
 const HostChargers = () => {
   const [chargers, setChargers] = useState([]);

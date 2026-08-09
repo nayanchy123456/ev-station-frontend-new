@@ -18,6 +18,8 @@ import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
 /* ✅ FIX: Leaflet default icon setup */
 delete L.Icon.Default.prototype._getIconUrl;
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8080";
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: markerIcon2x,
   iconUrl: markerIcon,
@@ -138,7 +140,7 @@ const ChargerDetail = () => {
           <div className="charger-gallery-section">
             <div className="main-image-container">
               <img
-                src={`http://localhost:8080${charger.images[selectedImage]}`}
+                src={`${BACKEND_URL}${charger.images[selectedImage]}`}
                 alt={`${charger.name} - Image ${selectedImage + 1}`}
                 className="main-image"
                 onError={(e) => {
@@ -156,7 +158,7 @@ const ChargerDetail = () => {
                 {charger.images.map((img, idx) => (
                   <img
                     key={idx}
-                    src={`http://localhost:8080${img}`}
+                    src={`${BACKEND_URL}${img}`}
                     alt={`Thumbnail ${idx + 1}`}
                     className={`thumbnail ${
                       selectedImage === idx ? "active" : ""

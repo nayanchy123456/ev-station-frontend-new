@@ -6,7 +6,7 @@ import ChargerMap from "./ChargerMap";
 import StarRating from "../../../rating/StarRating.jsx";
 import ratingService from "../../../../services/ratingService.js";
 
-const BACKEND_URL = "http://localhost:8080";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8080";
 
 const ChargerList = () => {
   const navigate = useNavigate();
