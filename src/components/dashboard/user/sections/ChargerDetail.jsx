@@ -149,7 +149,7 @@ const ChargerDetail = () => {
                 className="main-image"
                 onError={(e) => {
                   e.target.src =
-                    "https://via.placeholder.com/600x400?text=No+Image";
+                    "/no-image.svg";
                 }}
               />
               <div className="image-counter">
@@ -170,7 +170,7 @@ const ChargerDetail = () => {
                     onClick={() => setSelectedImage(idx)}
                     onError={(e) => {
                       e.target.src =
-                        "https://via.placeholder.com/100x100?text=No+Image";
+                        "/no-image.svg";
                     }}
                   />
                 ))}
