@@ -345,7 +345,7 @@ const EditCharger = () => {
                     alt={`Existing ${idx + 1}`}
                     onError={(e) => {
                       console.error("Failed to load image:", img);
-                      e.target.src = "https://via.placeholder.com/160x120?text=Image+Not+Found";
+                      e.target.src = "/no-image.svg";
                     }}
                   />
                 ))}

@@ -115,7 +115,7 @@ const ChargerList = () => {
   };
 
   const getImageUrl = imgPath => {
-    if (!imgPath) return "https://via.placeholder.com/160x120?text=No+Image";
+    if (!imgPath) return "/no-image.svg";
     if (imgPath.startsWith("http")) return imgPath;
     return `${BACKEND_URL}${imgPath.startsWith("/") ? "" : "/"}${imgPath}`;
   };
@@ -170,8 +170,8 @@ const ChargerList = () => {
                       <button className="arrow left" onClick={e => { e.stopPropagation(); scrollCarousel(c.id, "left"); }} disabled={activeIndex[c.id] === 0}>&lt;</button>
                       <div className="carousel-wrapper" ref={el => (carouselRefs.current[c.id] = el)}>
                         {c.images && c.images.length > 0 ? c.images.map((img, idx) => (
-                          <img key={idx} src={getImageUrl(img)} alt={`${c.name} - Image ${idx + 1}`} onError={e => e.target.src = "https://via.placeholder.com/160x120?text=Image+Not+Found"} />
-                        )) : <img src="https://via.placeholder.com/160x120?text=No+Image" alt="No charger images" />}
+                          <img key={idx} src={getImageUrl(img)} alt={`${c.name} - Image ${idx + 1}`} onError={e => e.target.src = "/no-image.svg"} />
+                        )) : <img src="/no-image.svg" alt="No charger images" />}
                       </div>
                       <button className="arrow right" onClick={e => { e.stopPropagation(); scrollCarousel(c.id, "right"); }} disabled={activeIndex[c.id] === (c.images?.length || 1) - 1}>&gt;</button>
                     </div>

@@ -78,7 +78,7 @@ const HostChargers = () => {
                     <img key={idx} src={img.startsWith("http") ? img : `${BACKEND_URL}${img}`} alt={`${charger.name} ${idx}`} />
                     ))
                   ) : (
-                    <img src="https://via.placeholder.com/150x100?text=No+Image" alt="No Charger"/>
+                    <img src="/no-image.svg" alt="No Charger"/>
                   )}
                 </div>
                 <button className="arrow right" onClick={() => scrollCarousel(charger.id, "right")}>&gt;</button>
