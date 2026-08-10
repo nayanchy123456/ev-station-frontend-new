@@ -140,7 +140,11 @@ const ChargerDetail = () => {
           <div className="charger-gallery-section">
             <div className="main-image-container">
               <img
-                src={`${BACKEND_URL}${charger.images[selectedImage]}`}
+                src={
+                  charger.images[selectedImage].startsWith("http")
+                    ? charger.images[selectedImage]
+                    : `${BACKEND_URL}${charger.images[selectedImage]}`
+                }
                 alt={`${charger.name} - Image ${selectedImage + 1}`}
                 className="main-image"
                 onError={(e) => {
@@ -153,12 +157,12 @@ const ChargerDetail = () => {
               </div>
             </div>
 
-            {charger.images.length > 1 && (
+{charger.images.length > 1 && (
               <div className="thumbnail-gallery">
                 {charger.images.map((img, idx) => (
                   <img
                     key={idx}
-                    src={`${BACKEND_URL}${img}`}
+                    src={img.startsWith("http") ? img : `${BACKEND_URL}${img}`}
                     alt={`Thumbnail ${idx + 1}`}
                     className={`thumbnail ${
                       selectedImage === idx ? "active" : ""

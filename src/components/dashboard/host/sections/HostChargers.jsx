@@ -75,7 +75,7 @@ const HostChargers = () => {
                 <div className="carousel-wrapper" ref={el => (carouselRefs.current[charger.id] = el)}>
                   {charger.images && charger.images.length > 0 ? (
                     charger.images.map((img, idx) => (
-                      <img key={idx} src={`${BACKEND_URL}${img}`} alt={`${charger.name} ${idx}`} />
+                    <img key={idx} src={img.startsWith("http") ? img : `${BACKEND_URL}${img}`} alt={`${charger.name} ${idx}`} />
                     ))
                   ) : (
                     <img src="https://via.placeholder.com/150x100?text=No+Image" alt="No Charger"/>
