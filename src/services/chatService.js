@@ -2,6 +2,47 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
+// Dedicated axios instance for chat, with the same auto-refresh-on-401
+// behavior as api.js's shared instance — the raw `axios` import doesn't
+// retry expired tokens, which is why unread-count calls were failing silently.
+const chatApi = axios.create();
+
+chatApi.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        console.log("🔄 [chatApi] Attempting token refresh...");
+        const refreshRes = await axios.post(
+          `${API_URL}/auth/refresh`,
+          null,
+          { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+        );
+
+        const newToken = refreshRes.data.token;
+        if (newToken) {
+          console.log("✅ [chatApi] Token refreshed");
+          localStorage.setItem('token', newToken);
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          return chatApi(originalRequest);
+        }
+      } catch (refreshError) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('role');
+        window.location.href = '/login';
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 /**
  * Enhanced Chat Service with Admin Support
  * 
@@ -30,15 +71,9 @@ class ChatService {
 
   // ==================== CONVERSATION MANAGEMENT ====================
 
-  /**
-   * Initiate or get conversation with context
-   * 
-   * @param {Object} request - Conversation initiate request
-   * @returns {Promise<Object>} Conversation data
-   */
   async initiateConversation(request) {
     try {
-      const response = await axios.post(
+      const response = await chatApi.post(
         `${API_URL}/chat/conversations/initiate`,
         request,
         { headers: this.getAuthHeaders() }
@@ -50,16 +85,9 @@ class ChatService {
     }
   }
 
-  /**
-   * Get all conversations for current user
-   * 
-   * @param {number} page - Page number (0-indexed)
-   * @param {number} size - Number of conversations per page
-   * @returns {Promise<Object>} Paginated conversations
-   */
   async getConversations(page = 0, size = 20) {
     try {
-      const response = await axios.get(
+      const response = await chatApi.get(
         `${API_URL}/chat/conversations`,
         {
           params: { page, size },
@@ -73,17 +101,9 @@ class ChatService {
     }
   }
 
-  /**
-   * Get conversations by type
-   * 
-   * @param {string} type - Conversation type (USER_HOST, USER_ADMIN, HOST_ADMIN, ADMIN_SUPPORT)
-   * @param {number} page - Page number
-   * @param {number} size - Page size
-   * @returns {Promise<Object>} Filtered conversations
-   */
   async getConversationsByType(type, page = 0, size = 20) {
     try {
-      const response = await axios.get(
+      const response = await chatApi.get(
         `${API_URL}/chat/conversations/type/${type}`,
         {
           params: { page, size },
@@ -97,15 +117,9 @@ class ChatService {
     }
   }
 
-  /**
-   * Get specific conversation by ID
-   * 
-   * @param {number} conversationId - Conversation ID
-   * @returns {Promise<Object>} Conversation data
-   */
   async getConversation(conversationId) {
     try {
-      const response = await axios.get(
+      const response = await chatApi.get(
         `${API_URL}/chat/conversations/${conversationId}`,
         { headers: this.getAuthHeaders() }
       );
@@ -116,15 +130,9 @@ class ChatService {
     }
   }
 
-  /**
-   * Get or create a conversation with a specific user
-   * 
-   * @param {number} otherUserId - ID of the other user
-   * @returns {Promise<Object>} Conversation data
-   */
   async getOrCreateConversation(otherUserId) {
     try {
-      const response = await axios.post(
+      const response = await chatApi.post(
         `${API_URL}/chat/conversations/initiate`,
         { otherUserId },
         { headers: this.getAuthHeaders() }
@@ -136,16 +144,9 @@ class ChatService {
     }
   }
 
-  /**
-   * Archive/unarchive conversation
-   * 
-   * @param {number} conversationId - Conversation ID
-   * @param {boolean} archive - True to archive, false to unarchive
-   * @returns {Promise<void>}
-   */
   async archiveConversation(conversationId, archive = true) {
     try {
-      await axios.put(
+      await chatApi.put(
         `${API_URL}/chat/conversations/${conversationId}/archive`,
         { archive },
         { headers: this.getAuthHeaders() }
@@ -156,17 +157,9 @@ class ChatService {
     }
   }
 
-  /**
-   * Search conversations
-   * 
-   * @param {string} query - Search query
-   * @param {number} page - Page number
-   * @param {number} size - Page size
-   * @returns {Promise<Object>} Search results
-   */
   async searchConversations(query, page = 0, size = 20) {
     try {
-      const response = await axios.get(
+      const response = await chatApi.get(
         `${API_URL}/chat/conversations/search`,
         {
           params: { q: query, page, size },
@@ -182,32 +175,14 @@ class ChatService {
 
   // ==================== MESSAGE MANAGEMENT ====================
 
-  /**
-   * Send a message (REST fallback) - DEPRECATED
-   * Note: The backend doesn't have POST /api/chat/send endpoint
-   * Messages should be sent via WebSocket only
-   * 
-   * @param {number} receiverId - ID of the message recipient
-   * @param {string} content - Message content
-   * @param {number} conversationId - Optional conversation ID
-   * @returns {Promise<Object>} Sent message data
-   */
   async sendMessage(receiverId, content, conversationId = null) {
     console.warn('⚠️ sendMessage REST endpoint is deprecated. Use WebSocket instead.');
     throw new Error('Please send messages via WebSocket. REST endpoint not available.');
   }
 
-  /**
-   * Get messages for a specific conversation
-   * 
-   * @param {number} conversationId - Conversation ID
-   * @param {number} page - Page number (0-indexed)
-   * @param {number} size - Number of messages per page
-   * @returns {Promise<Object>} Paginated messages
-   */
   async getMessages(conversationId, page = 0, size = 30) {
     try {
-      const response = await axios.get(
+      const response = await chatApi.get(
         `${API_URL}/chat/conversations/${conversationId}/messages`,
         {
           params: { page, size },
@@ -221,15 +196,9 @@ class ChatService {
     }
   }
 
-  /**
-   * Mark all messages in a conversation as read
-   * 
-   * @param {number} conversationId - Conversation ID
-   * @returns {Promise<void>}
-   */
   async markAsRead(conversationId) {
     try {
-      await axios.put(
+      await chatApi.put(
         `${API_URL}/chat/conversations/${conversationId}/read`,
         {},
         { headers: this.getAuthHeaders() }
@@ -240,18 +209,9 @@ class ChatService {
     }
   }
 
-  /**
-   * Search messages in a conversation
-   * 
-   * @param {number} conversationId - Conversation ID
-   * @param {string} query - Search query
-   * @param {number} page - Page number
-   * @param {number} size - Page size
-   * @returns {Promise<Object>} Search results
-   */
   async searchMessages(conversationId, query, page = 0, size = 20) {
     try {
-      const response = await axios.get(
+      const response = await chatApi.get(
         `${API_URL}/chat/conversations/${conversationId}/search`,
         {
           params: { q: query, page, size },
@@ -267,16 +227,9 @@ class ChatService {
 
   // ==================== ADMIN FUNCTIONS ====================
 
-  /**
-   * Get support conversations (Admin only)
-   * 
-   * @param {number} page - Page number
-   * @param {number} size - Page size
-   * @returns {Promise<Object>} Support conversations
-   */
   async getAdminSupportConversations(page = 0, size = 20) {
     try {
-      const response = await axios.get(
+      const response = await chatApi.get(
         `${API_URL}/chat/admin/support`,
         {
           params: { page, size },
@@ -290,15 +243,9 @@ class ChatService {
     }
   }
 
-  /**
-   * Search users for admin chat (Admin only)
-   * 
-   * @param {Object} request - Search request with filters
-   * @returns {Promise<Object>} Page of users
-   */
   async searchUsersForAdminChat(request) {
     try {
-      const response = await axios.post(
+      const response = await chatApi.post(
         `${API_URL}/chat/admin/search-users`,
         request,
         { headers: this.getAuthHeaders() }
@@ -310,15 +257,9 @@ class ChatService {
     }
   }
 
-  /**
-   * Admin initiate chat with user (Admin only)
-   * 
-   * @param {Object} request - Contains targetUserId and optional initialMessage
-   * @returns {Promise<Object>} Created conversation
-   */
   async adminInitiateChat(request) {
     try {
-      const response = await axios.post(
+      const response = await chatApi.post(
         `${API_URL}/chat/admin/initiate`,
         request,
         { headers: this.getAuthHeaders() }
@@ -332,15 +273,9 @@ class ChatService {
 
   // ==================== CHARGER FUNCTIONS ====================
 
-  /**
-   * Get charger host ID
-   * 
-   * @param {number} chargerId - Charger ID
-   * @returns {Promise<number>} Host user ID
-   */
   async getChargerHostId(chargerId) {
     try {
-      const response = await axios.get(
+      const response = await chatApi.get(
         `${API_URL}/chat/charger/${chargerId}/host`,
         { headers: this.getAuthHeaders() }
       );
@@ -351,17 +286,9 @@ class ChatService {
     }
   }
 
-  /**
-   * Get conversations about a specific charger
-   * 
-   * @param {number} chargerId - Charger ID
-   * @param {number} page - Page number
-   * @param {number} size - Page size
-   * @returns {Promise<Object>} Charger conversations
-   */
   async getChargerConversations(chargerId, page = 0, size = 20) {
     try {
-      const response = await axios.get(
+      const response = await chatApi.get(
         `${API_URL}/chat/charger/${chargerId}/conversations`,
         {
           params: { page, size },
@@ -377,14 +304,9 @@ class ChatService {
 
   // ==================== UTILITY FUNCTIONS ====================
 
-  /**
-   * Get total unread message count
-   * 
-   * @returns {Promise<Object>} Object with totalUnreadCount
-   */
   async getTotalUnreadCount() {
     try {
-      const response = await axios.get(
+      const response = await chatApi.get(
         `${API_URL}/chat/unread/total`,
         { headers: this.getAuthHeaders() }
       );
@@ -395,12 +317,6 @@ class ChatService {
     }
   }
 
-  /**
-   * Get unread count (alias for getTotalUnreadCount for backward compatibility)
-   * This is used by Navbar component
-   * 
-   * @returns {Promise<number>} Unread count
-   */
   async getUnreadCount() {
     try {
       const data = await this.getTotalUnreadCount();
@@ -411,15 +327,9 @@ class ChatService {
     }
   }
 
-  /**
-   * Get user presence status
-   * 
-   * @param {number} userId - User ID
-   * @returns {Promise<Object>} Presence data
-   */
   async getUserPresence(userId) {
     try {
-      const response = await axios.get(
+      const response = await chatApi.get(
         `${API_URL}/chat/presence/${userId}`,
         { headers: this.getAuthHeaders() }
       );
@@ -430,14 +340,9 @@ class ChatService {
     }
   }
 
-  /**
-   * Check chat service health
-   * 
-   * @returns {Promise<Object>} Health status
-   */
   async checkHealth() {
     try {
-      const response = await axios.get(
+      const response = await chatApi.get(
         `${API_URL}/chat/health`,
         { headers: this.getAuthHeaders() }
       );
@@ -448,12 +353,6 @@ class ChatService {
     }
   }
 
-  /**
-   * Handle API errors consistently
-   * 
-   * @param {Error} error - Axios error object
-   * @returns {Error} Formatted error
-   */
   handleError(error) {
     if (error.response) {
       const message = error.response.data?.message || error.response.data || 'An error occurred';
