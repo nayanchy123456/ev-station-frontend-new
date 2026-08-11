@@ -4,7 +4,7 @@ import { FiMessageSquare } from "react-icons/fi"; // ⭐ NEW - Message icon
 import notificationService from "../../services/notificationService";
 import chatService from "../../services/chatService"; // ⭐ NEW - Chat service
 import "../../css/navbar.css";
-import NotificationDropdown from "./NotificationDropDown";
+import NotificationDropdown from "./NotificationDropdown";
 
 const Navbar = ({ toggleSidebar, sidebarCollapsed, onSearch, setActiveSection }) => {
   const [searchFocused, setSearchFocused] = useState(false);
