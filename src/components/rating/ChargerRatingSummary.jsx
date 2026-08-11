@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import StarRating from "./StarRating";
 import ratingService from "../../services/ratingService";
-import "../../css/rating/RatingSummary.css";
+import "../../css/rating/ratingSummary.css";
 
 /**
  * ChargerRatingSummary Component
