@@ -230,3 +230,4 @@ Singleton STOMP client. Key methods:
 
 ### `chatService.js`
 REST wrapper for conversation and message endpoints. Supports conversation initiation, pagination, message sending, read receipts, unread counts, and user presence tracking.
+ 
